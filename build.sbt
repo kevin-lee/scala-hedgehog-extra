@@ -1,7 +1,5 @@
 import SbtProjectInfo.{ProjectName, commonWarts}
-import kevinlee.sbt.SbtCommon.crossVersionProps
 import just.semver.SemVer
-import SemVer.{Major, Minor}
 
 lazy val props =
   new {
@@ -10,7 +8,7 @@ lazy val props =
     val Org            = "io.kevinlee"
 
     val ProjectScalaVersion = "2.13.3"
-    val CrossScalaVersions  = Seq("2.11.12", "2.12.12", ProjectScalaVersion, "3.0.0-M2")
+    val CrossScalaVersions  = Seq("2.11.12", "2.12.13", ProjectScalaVersion, "3.0.0-RC1")
 
     val removeDottyIncompatible: ModuleID => Boolean =
       m =>
@@ -20,7 +18,7 @@ lazy val props =
           m.name == "better-monadic-for" ||
           m.name == "mdoc"
 
-    val hedgehogVersion = "0.6.1"
+    val hedgehogVersion = "0.6.5"
 
     val IncludeTest: String = "compile->compile;test->test"
   }
@@ -45,16 +43,28 @@ ThisBuild / developers := List(
     url(s"https://github.com/${props.GitHubUsername}"),
   )
 )
+ThisBuild / testFrameworks ++= Seq(TestFramework("hedgehog.sbt.Framework"))
 
 lazy val hedgehogExtra = Project("hedgehog-extra", file("."))
   .settings(
     libraryDependencies := removeDottyIncompatible(isDotty.value, libraryDependencies.value)
   )
-  .aggregate(extraCore)
+  .aggregate(extraCore, extraRefined)
 
 lazy val extraCore = subProject("extra-core", ProjectName("core"), file("extra-core"))
   .settings(
     libraryDependencies := removeDottyIncompatible(isDotty.value, libraryDependencies.value)
+  )
+
+lazy val extraRefined = subProject("extra-refined", ProjectName("refined"), file("extra-refined"))
+  .settings(
+    libraryDependencies ++= (SemVer.parseUnsafe(scalaVersion.value) match {
+      case SemVer(SemVer.Major(2), SemVer.Minor(11), _, _, _) =>
+        Seq("eu.timepit" %% "refined" % "0.9.12")
+      case _                                                  =>
+        Seq("eu.timepit" %% "refined" % "0.9.21")
+    }),
+    libraryDependencies := removeDottyIncompatible(isDotty.value, libraryDependencies.value),
   )
 
 def removeDottyIncompatible(isDotty: Boolean, libraries: Seq[ModuleID]): Seq[ModuleID] =
@@ -103,25 +113,24 @@ def subProject(id: String, projectName: ProjectName, file: File): Project =
     .settings(
       name := prefixedProjectName(projectName.projectName),
       crossScalaVersions := props.CrossScalaVersions,
-      addCompilerPlugin("org.typelevel" % "kind-projector"     % "0.11.2" cross CrossVersion.full),
+      addCompilerPlugin("org.typelevel" % "kind-projector"     % "0.11.3" cross CrossVersion.full),
       addCompilerPlugin("com.olegpy"   %% "better-monadic-for" % "0.3.1"),
       scalacOptions := scalacOptionsPostProcess(
         SemVer.parseUnsafe(scalaVersion.value),
         isDotty.value,
         scalacOptions.value,
       ),
+      testFrameworks ++= Seq(TestFramework("hedgehog.sbt.Framework")),
       resolvers ++= Seq(
         Resolver.sonatypeRepo("releases")
       ),
       libraryDependencies ++=
-        libs.hedgehogLibs ++ Seq("eu.timepit" %% "refined" % "0.9.19")
+        libs.hedgehogLibs,
       /* WartRemover and scalacOptions { */
-      //      , wartremoverErrors in (Compile, compile) ++= commonWarts((scalaBinaryVersion in update).value)
-      //      , wartremoverErrors in (Test, compile) ++= commonWarts((scalaBinaryVersion in update).value)
-      ,
-      wartremoverErrors ++= commonWarts((scalaBinaryVersion in update).value)
+      wartremoverErrors in (Compile, compile) ++= commonWarts((scalaBinaryVersion in update).value),
+      wartremoverErrors in (Test, compile) ++= commonWarts((scalaBinaryVersion in update).value),
+//      wartremoverErrors ++= commonWarts((scalaBinaryVersion in update).value)
       //      , wartremoverErrors ++= Warts.all
-      ,
       Compile / console / wartremoverErrors := List.empty,
       Compile / console / wartremoverWarnings := List.empty,
       Compile / console / scalacOptions :=
@@ -135,11 +144,10 @@ def subProject(id: String, projectName: ProjectName, file: File): Project =
         (console / scalacOptions)
           .value
           .distinct
-          .filterNot(option => option.contains("wartremover") || option.contains("import"))
-      /* } WartRemover and scalacOptions */,
-      testFrameworks ++= Seq(TestFramework("hedgehog.sbt.Framework"))
-
-      /* Ammonite-REPL { */,
+          .filterNot(option => option.contains("wartremover") || option.contains("import")),
+      /* } WartRemover and scalacOptions */
+      testFrameworks ++= Seq(TestFramework("hedgehog.sbt.Framework")),
+      /* Ammonite-REPL { */
       libraryDependencies ++=
         (scalaBinaryVersion.value match {
           case "2.10" =>
@@ -147,9 +155,9 @@ def subProject(id: String, projectName: ProjectName, file: File): Project =
           case "2.11" =>
             Seq("com.lihaoyi" % "ammonite" % "1.6.7" % Test cross CrossVersion.full)
           case "2.12" =>
-            Seq("com.lihaoyi" % "ammonite" % "2.2.0" % Test cross CrossVersion.full)
+            Seq("com.lihaoyi" % "ammonite" % "2.3.8-36-1cce53f3" % Test cross CrossVersion.full)
           case "2.13" =>
-            Seq("com.lihaoyi" % "ammonite" % "2.3.8-4-88785969" % Test cross CrossVersion.full)
+            Seq("com.lihaoyi" % "ammonite" % "2.3.8-36-1cce53f3" % Test cross CrossVersion.full)
           case _      =>
             Seq.empty[ModuleID]
         }),
