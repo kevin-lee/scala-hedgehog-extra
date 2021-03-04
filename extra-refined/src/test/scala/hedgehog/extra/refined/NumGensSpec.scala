@@ -11,7 +11,11 @@ object NumGensSpec extends Properties {
     property("testGenNegativeInt", testGenNegativeInt),
     property("testGenNonPositiveInt", testGenNonPositiveInt),
     property("testGenPositiveInt", testGenPositiveInt),
-    property("testGenNonNegativeInt", testGenNonNegativeInt)
+    property("testGenNonNegativeInt", testGenNonNegativeInt),
+    property("testGenNegativeLong", testGenNegativeLong),
+    property("testGenNonPositiveLong", testGenNonPositiveLong),
+    property("testGenPositiveLong", testGenPositiveLong),
+    property("testGenNonNegativeLong", testGenNonNegativeLong)
   )
 
   def testGenNegativeInt: Property = for {
@@ -53,6 +57,50 @@ object NumGensSpec extends Properties {
     Result.all(
       List(
         Result.diffNamed("n should be greater than or equal to 0", n, 0)(_.value >= _),
+        ((n.value < 0) ==== false).log(s"n should not be less than zero. n: ${n.toString}")
+      )
+    )
+  }
+
+  def testGenNegativeLong: Property = for {
+    n <- NumGens.genNegativeLong(NegativeLong.MinValue).log("n")
+  } yield {
+    Result.all(
+      List(
+        Result.diffNamed("n should be less than 0", n, 0L)(_.value < _),
+        ((n.value >= 0) ==== false).log(s"n should not be greater than or equal to 0. n: ${n.toString}")
+      )
+    )
+  }
+
+  def testGenNonPositiveLong: Property = for {
+    n <- NumGens.genNonPositiveLong(NonPositiveLong.MinValue).log("n")
+  } yield {
+    Result.all(
+      List(
+        Result.diffNamed("n should be less than 0", n, 0L)(_.value <= _),
+        ((n.value > 0) ==== false).log(s"n should not be greater than zero. n: ${n.toString}")
+      )
+    )
+  }
+
+  def testGenPositiveLong: Property = for {
+    n <- NumGens.genPositiveLong(PositiveLong.MaxValue).log("n")
+  } yield {
+    Result.all(
+      List(
+        Result.diffNamed("n should be greater than 0", n, 0L)(_.value > _),
+        ((n.value <= 0) ==== false).log(s"n should not be less than or equal to 0. n: ${n.toString}")
+      )
+    )
+  }
+
+  def testGenNonNegativeLong: Property = for {
+    n <- NumGens.genNonNegativeLong(NonNegativeLong.MaxValue).log("n")
+  } yield {
+    Result.all(
+      List(
+        Result.diffNamed("n should be greater than or equal to 0", n, 0L)(_.value >= _),
         ((n.value < 0) ==== false).log(s"n should not be less than zero. n: ${n.toString}")
       )
     )
