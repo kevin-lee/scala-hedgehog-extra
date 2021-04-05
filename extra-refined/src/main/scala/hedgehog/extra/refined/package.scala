@@ -54,10 +54,11 @@ package object refined {
   }
 
   implicit final class PropertyOps[A](val a: A) extends AnyVal {
+    @SuppressWarnings(Array("org.wartremover.warts.ToString"))
     def matchPattern(right: PartialFunction[Any, _]): Result =
       if (right.isDefinedAt(a))
         Result.success
       else
-        Result.failure.log(s"actual: $a")
+        Result.failure.log(s"actual: ${a.toString}")
   }
 }
