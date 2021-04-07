@@ -1,6 +1,6 @@
 package hedgehog.extra
 
-import hedgehog.Gen
+import hedgehog._
 
 /** @author Kevin Lee
   * @since 2021-04-06
@@ -14,5 +14,8 @@ object Gens {
           (to + 1 - from) -> Gen.char(from.toChar, to.toChar)
       }
     )
+
+  def genNonWhitespaceChar: Gen[Char] =
+    genCharByRange(common.NonWhitespaceCharRange)
 
 }

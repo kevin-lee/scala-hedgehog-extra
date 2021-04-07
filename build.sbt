@@ -36,6 +36,7 @@ lazy val extraRefined = subProject("extra-refined", ProjectName("refined"), file
     }),
     libraryDependencies := removeDottyIncompatible(isDotty.value, libraryDependencies.value),
   )
+  .dependsOn(extraCore)
 
 lazy val props =
   new {
@@ -73,6 +74,11 @@ lazy val libs =
       "qa.hedgehog" %% "hedgehog-core"   % props.hedgehogVersion,
       "qa.hedgehog" %% "hedgehog-runner" % props.hedgehogVersion,
     )
+    val hedgehogLibsForTesting: Seq[ModuleID] = Seq(
+      "qa.hedgehog" %% "hedgehog-core"   % props.hedgehogVersion,
+      "qa.hedgehog" %% "hedgehog-runner" % props.hedgehogVersion,
+      "qa.hedgehog" %% "hedgehog-sbt"    % props.hedgehogVersion,
+    ).map(_ % Test)
   }
 
 def removeDottyIncompatible(isDotty: Boolean, libraries: Seq[ModuleID]): Seq[ModuleID] =
@@ -134,11 +140,7 @@ def subProject(id: String, projectName: ProjectName, file: File): Project =
         (Test / compile / scalacOptions).value,
       ),
       testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
-      resolvers ++= Seq(
-        Resolver.sonatypeRepo("releases")
-      ),
-      libraryDependencies ++=
-        libs.hedgehogLibs,
+      libraryDependencies ++= libs.hedgehogLibs ++ libs.hedgehogLibsForTesting,
       /* WartRemover and scalacOptions { */
       Compile / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
       Test / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
