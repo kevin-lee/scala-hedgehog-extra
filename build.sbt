@@ -10,20 +10,20 @@ ThisBuild / developers := List(
     props.GitHubUsername,
     "Kevin Lee",
     "kevin.code@kevinlee.io",
-    url(s"https://github.com/${props.GitHubUsername}"),
+    url(s"https://github.com/${props.GitHubUsername}")
   )
 )
 ThisBuild / testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct)
 
 lazy val hedgehogExtra = Project("hedgehog-extra", file("."))
   .settings(
-    libraryDependencies := removeDottyIncompatible(isDotty.value, libraryDependencies.value)
+    libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
   .aggregate(extraCore, extraRefined)
 
 lazy val extraCore = subProject("extra-core", ProjectName("core"), file("extra-core"))
   .settings(
-    libraryDependencies := removeDottyIncompatible(isDotty.value, libraryDependencies.value)
+    libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
 
 lazy val extraRefined = subProject("extra-refined", ProjectName("refined"), file("extra-refined"))
@@ -32,30 +32,29 @@ lazy val extraRefined = subProject("extra-refined", ProjectName("refined"), file
       case SemVer(SemVer.Major(2), SemVer.Minor(11), _, _, _) =>
         Seq("eu.timepit" %% "refined" % "0.9.12")
       case _                                                  =>
-        Seq("eu.timepit" %% "refined" % "0.9.23")
+        Seq("eu.timepit" %% "refined" % "0.9.26")
     }),
-    libraryDependencies := removeDottyIncompatible(isDotty.value, libraryDependencies.value),
+    libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
   .dependsOn(extraCore)
 
 lazy val props =
   new {
-    val GitHubUsername = "Kevin-Lee"
-    val RepoName       = "scala-hedgehog-extra"
-    val Org            = "io.kevinlee"
+    final val Org            = "io.kevinlee"
+    final val GitHubUsername = "Kevin-Lee"
+    final val RepoName       = "scala-hedgehog-extra"
 
-        val ProjectScalaVersion = "2.13.5"
-//    val ProjectScalaVersion = "3.0.0-RC2"
-    val CrossScalaVersions  = Seq(
-      "2.11.12",
-      "2.12.13",
-      "2.13.5",
-//      "3.0.0-RC1",
-//      "3.0.0-RC2",
-      ProjectScalaVersion
-    ).distinct
+    final val ProjectScalaVersion = "2.13.5"
+//    final val ProjectScalaVersion = "3.0.0"
+    final val CrossScalaVersions  =
+      Seq(
+        "2.11.12",
+        "2.12.13",
+        "2.13.5",
+        ProjectScalaVersion
+      ).distinct
 
-    val removeDottyIncompatible: ModuleID => Boolean =
+    final val removeDottyIncompatible: ModuleID => Boolean =
       m =>
         m.name == "wartremover" ||
           m.name == "ammonite" ||
@@ -63,26 +62,26 @@ lazy val props =
           m.name == "better-monadic-for" ||
           m.name == "mdoc"
 
-    val hedgehogVersion = "0.6.5"
+    final val hedgehogVersion = "0.7.0"
 
-    val IncludeTest: String = "compile->compile;test->test"
+    final val IncludeTest = "compile->compile;test->test"
   }
 
 lazy val libs =
   new {
-    val hedgehogLibs: Seq[ModuleID] = Seq(
+    lazy val hedgehogLibs = Seq(
       "qa.hedgehog" %% "hedgehog-core"   % props.hedgehogVersion,
-      "qa.hedgehog" %% "hedgehog-runner" % props.hedgehogVersion,
+      "qa.hedgehog" %% "hedgehog-runner" % props.hedgehogVersion
     )
-    val hedgehogLibsForTesting: Seq[ModuleID] = Seq(
-      "qa.hedgehog" %% "hedgehog-core"   % props.hedgehogVersion,
-      "qa.hedgehog" %% "hedgehog-runner" % props.hedgehogVersion,
-      "qa.hedgehog" %% "hedgehog-sbt"    % props.hedgehogVersion,
-    ).map(_ % Test)
+
+    lazy val hedgehogLibsForTesting =
+      (hedgehogLibs ++ Seq(
+        "qa.hedgehog" %% "hedgehog-sbt" % props.hedgehogVersion
+      )).map(_ % Test)
   }
 
-def removeDottyIncompatible(isDotty: Boolean, libraries: Seq[ModuleID]): Seq[ModuleID] =
-  if (isDotty)
+def removeDottyIncompatible(isScala3: Boolean, libraries: Seq[ModuleID]): Seq[ModuleID] =
+  if (isScala3)
     libraries.filterNot(props.removeDottyIncompatible).distinct
   else
     libraries.distinct
@@ -93,52 +92,11 @@ def removeDottyIncompatible(isDotty: Boolean, libraries: Seq[ModuleID]): Seq[Mod
 def prefixedProjectName(name: String) = s"${props.RepoName}${if (name.isEmpty) "" else s"-$name"}"
 // format: on
 
-def scalacOptionsPostProcess(scalaSemVer: SemVer, options: Seq[String]): Seq[String] =
-  (scalaSemVer.major, scalaSemVer.minor) match {
-    case (SemVer.Major(3), SemVer.Minor(0)) =>
-      Seq(
-        "-source:3.0-migration",
-        "-language:" + List(
-          "dynamics",
-          "existentials",
-          "higherKinds",
-          "reflectiveCalls",
-          "experimental.macros",
-          "implicitConversions",
-        ).mkString(","),
-        "-Ykind-projector",
-        "-siteroot",
-        "./dotty-docs",
-      )
-    case (SemVer.Major(2), SemVer.Minor(13)) =>
-      ((if (scalaSemVer.patch.patch >= 3) {
-        options.distinct.filterNot(_ == "-Xlint:nullary-override")
-      } else {
-        options.distinct
-      }) ++ Seq("-Ymacro-annotations", "-language:implicitConversions")).distinct
-    case (_, _) =>
-      options.distinct
-  }
-
 def subProject(id: String, projectName: ProjectName, file: File): Project =
   Project(id, file)
     .settings(
       name := prefixedProjectName(projectName.projectName),
       crossScalaVersions := props.CrossScalaVersions,
-      addCompilerPlugin("org.typelevel" % "kind-projector"     % "0.11.3" cross CrossVersion.full),
-      addCompilerPlugin("com.olegpy"   %% "better-monadic-for" % "0.3.1"),
-      scalacOptions := scalacOptionsPostProcess(
-        SemVer.parseUnsafe(scalaVersion.value),
-        scalacOptions.value,
-      ),
-      Compile / compile / scalacOptions := scalacOptionsPostProcess(
-        SemVer.parseUnsafe(scalaVersion.value),
-        (Compile / compile / scalacOptions).value,
-      ),
-      Test / compile / scalacOptions := scalacOptionsPostProcess(
-        SemVer.parseUnsafe(scalaVersion.value),
-        (Test / compile / scalacOptions).value,
-      ),
       testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
       libraryDependencies ++= libs.hedgehogLibs ++ libs.hedgehogLibsForTesting,
       /* WartRemover and scalacOptions { */
@@ -187,7 +145,9 @@ def subProject(id: String, projectName: ProjectName, file: File): Project =
             }
           case _               =>
             task(Seq.empty[File])
-        }),
+        })
       /* } Ammonite-REPL */
 
     )
+
+def isScala3(scalaVersion: String): Boolean = scalaVersion.startsWith("3.0")
