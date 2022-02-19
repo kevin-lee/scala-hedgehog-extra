@@ -1,10 +1,9 @@
 package hedgehog.extra
 
 import eu.timepit.refined._
-import eu.timepit.refined.auto._
 import eu.timepit.refined.api._
+import eu.timepit.refined.auto._
 import eu.timepit.refined.numeric._
-import hedgehog.Result
 
 /** @author Kevin Lee
   * @since 2021-01-02
@@ -53,12 +52,4 @@ package object refined {
     final val MaxValue: NonNegativeLong = refineMV[NonNegative](Long.MaxValue)
   }
 
-  implicit final class PropertyOps[A](val a: A) extends AnyVal {
-    @SuppressWarnings(Array("org.wartremover.warts.ToString"))
-    def matchPattern(right: PartialFunction[Any, _]): Result =
-      if (right.isDefinedAt(a))
-        Result.success
-      else
-        Result.failure.log(s"actual: ${a.toString}")
-  }
 }
