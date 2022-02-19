@@ -62,7 +62,7 @@ lazy val props =
           m.name == "better-monadic-for" ||
           m.name == "mdoc"
 
-    final val hedgehogVersion = "0.7.0"
+    final val hedgehogVersion = "0.8.0"
 
     final val IncludeTest = "compile->compile;test->test"
   }
