@@ -21,12 +21,12 @@ lazy val hedgehogExtra = Project("hedgehog-extra", file("."))
   )
   .aggregate(extraCore, extraRefined)
 
-lazy val extraCore = subProject("extra-core", ProjectName("core"), file("extra-core"))
+lazy val extraCore = subProject(ProjectName("core"))
   .settings(
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
 
-lazy val extraRefined = subProject("extra-refined", ProjectName("refined"), file("extra-refined"))
+lazy val extraRefined = subProject(ProjectName("refined"))
   .settings(
     libraryDependencies ++= (SemVer.parseUnsafe(scalaVersion.value) match {
       case SemVer(SemVer.Major(2), SemVer.Minor(11), _, _, _) =>
@@ -92,10 +92,11 @@ def removeDottyIncompatible(isScala3: Boolean, libraries: Seq[ModuleID]): Seq[Mo
 def prefixedProjectName(name: String) = s"${props.RepoName}${if (name.isEmpty) "" else s"-$name"}"
 // format: on
 
-def subProject(id: String, projectName: ProjectName, file: File): Project =
-  Project(id, file)
+def subProject(projectName: ProjectName): Project = {
+  val prefixedName = prefixedProjectName(projectName.projectName)
+  Project(prefixedName, file(s"modules/$prefixedName"))
     .settings(
-      name := prefixedProjectName(projectName.projectName),
+      name := prefixedName,
       crossScalaVersions := props.CrossScalaVersions,
       testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
       libraryDependencies ++= libs.hedgehogLibs ++ libs.hedgehogLibsForTesting,
@@ -149,5 +150,6 @@ def subProject(id: String, projectName: ProjectName, file: File): Project =
       /* } Ammonite-REPL */
 
     )
+}
 
 def isScala3(scalaVersion: String): Boolean = scalaVersion.startsWith("3.0")
