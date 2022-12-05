@@ -1,7 +1,6 @@
 package hedgehog.extra.refined
 
-import eu.timepit.refined.auto._
-
+import eu.timepit.refined.types.numeric.PosInt
 import hedgehog._
 import hedgehog.runner._
 
@@ -15,7 +14,7 @@ object StringGensSpec extends Properties {
   )
 
   def testGenNonWhitespaceString: Property = for {
-    maxLength           <- NumGens.genPositiveInt(300).log("maxLength")
+    maxLength           <- NumGens.genPosInt(PosInt(300)).log("maxLength")
     nonWhitespaceString <- StringGens.genNonWhitespaceString(maxLength).log("nonWhitespaceString")
   } yield {
     (nonWhitespaceString.value.exists(_.isWhitespace) ==== false)

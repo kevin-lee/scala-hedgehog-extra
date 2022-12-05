@@ -44,13 +44,13 @@ lazy val props =
     final val GitHubUsername = "Kevin-Lee"
     final val RepoName       = "scala-hedgehog-extra"
 
-    final val ProjectScalaVersion = "2.13.5"
+    final val ProjectScalaVersion = "2.13.6"
 //    final val ProjectScalaVersion = "3.0.0"
     final val CrossScalaVersions  =
       Seq(
         "2.11.12",
         "2.12.13",
-        "2.13.5",
+        "2.13.6",
         ProjectScalaVersion
       ).distinct
 
@@ -103,7 +103,7 @@ def subProject(projectName: ProjectName): Project = {
       /* WartRemover and scalacOptions { */
       Compile / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
       Test / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
-//      wartremoverErrors ++= commonWarts((scalaBinaryVersion in update).value)
+      //      wartremoverErrors ++= commonWarts((scalaBinaryVersion in update).value)
       //      , wartremoverErrors ++= Warts.all
       Compile / console / wartremoverErrors := List.empty,
       Compile / console / wartremoverWarnings := List.empty,
@@ -127,24 +127,22 @@ def subProject(projectName: ProjectName): Project = {
             Seq.empty[ModuleID]
           case "2.11" =>
             Seq("com.lihaoyi" % "ammonite" % "1.6.7" % Test cross CrossVersion.full)
-          case "2.12" =>
-            Seq("com.lihaoyi" % "ammonite" % "2.3.8-36-1cce53f3" % Test cross CrossVersion.full)
-          case "2.13" =>
-            Seq("com.lihaoyi" % "ammonite" % "2.3.8-65-0f0d597f" % Test cross CrossVersion.full)
-          case _      =>
+          case "2.12" | "2.13" | "3" =>
+            Seq("com.lihaoyi" % "ammonite" % "2.5.3" % Test cross CrossVersion.full)
+          case _ =>
             Seq.empty[ModuleID]
         }),
       Test / sourceGenerators +=
         (scalaBinaryVersion.value match {
           case "2.10" | "2.11" =>
             task(Seq.empty[File])
-          case "2.12" | "2.13" =>
+          case "2.12" | "2.13" | "3" =>
             task {
               val file = (Test / sourceManaged).value / "amm.scala"
-              IO.write(file, """object amm extends App { ammonite.Main.main(args) }""")
+              IO.write(file, """object amm extends App { ammonite.AmmoniteMain.main(args) }""")
               Seq(file)
             }
-          case _               =>
+          case _ =>
             task(Seq.empty[File])
         })
       /* } Ammonite-REPL */
