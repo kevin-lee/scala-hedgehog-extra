@@ -17,7 +17,7 @@ object NumGensSpec extends Properties {
     property("testGenPositiveIntWithMinMax", testGenPositiveIntWithMinMax),
     property("testGenPositiveInt", testGenPositiveInt),
     property("testGenNonNegativeIntWithMinMax", testGenNonNegativeIntWithMinMax),
-    property("testGenNonNegativeInt", testGenNonNegativeInt),
+    property("testGenNonNegativeInt", testGenNonNegativeInt)
   ) ++ List(
     property("testGenNegativeLongWithMinMax", testGenNegativeLongWithMinMax),
     property("testGenNegativeLong", testGenNegativeLong),
@@ -26,7 +26,7 @@ object NumGensSpec extends Properties {
     property("testGenPositiveLongWithMinMax", testGenPositiveLongWithMinMax),
     property("testGenPositiveLong", testGenPositiveLong),
     property("testGenNonNegativeLongWithMinMax", testGenNonNegativeLongWithMinMax),
-    property("testGenNonNegativeLong", testGenNonNegativeLong),
+    property("testGenNonNegativeLong", testGenNonNegativeLong)
   ) ++ List(
     property("testGenNegDoubleWithMinMax", testGenNegDoubleWithMinMax),
     property("testGenNegDouble", testGenNegDouble),
@@ -35,7 +35,7 @@ object NumGensSpec extends Properties {
     property("testGenPosDoubleWithMinMax", testGenPosDoubleWithMinMax),
     property("testGenPosDouble", testGenPosDouble),
     property("testGenNonNegDoubleWithMinMax", testGenNonNegDoubleWithMinMax),
-    property("testGenNonNegDouble", testGenNonNegDouble),
+    property("testGenNonNegDouble", testGenNonNegDouble)
   )
 
   def testGenNegativeIntWithMinMax: Property = for {
@@ -50,7 +50,7 @@ object NumGensSpec extends Properties {
   }
 
   def testGenNegativeInt: Property = for {
-    n <- NumGens.genNegInt(NegInt.MinValue).log("n")
+    n <- NumGens.genNegIntMinTo(NegInt.MinValue).log("n")
   } yield {
     Result.all(
       List(
@@ -72,7 +72,7 @@ object NumGensSpec extends Properties {
   }
 
   def testGenNonPositiveInt: Property = for {
-    n <- NumGens.genNonPosInt(NonPosInt.MinValue).log("n")
+    n <- NumGens.genNonPosIntMinTo(NonPosInt.MinValue).log("n")
   } yield {
     Result.all(
       List(
@@ -94,7 +94,7 @@ object NumGensSpec extends Properties {
   }
 
   def testGenPositiveInt: Property = for {
-    n <- NumGens.genPosInt(PosInt.MaxValue).log("n")
+    n <- NumGens.genPosIntMaxTo(PosInt.MaxValue).log("n")
   } yield {
     Result.all(
       List(
@@ -116,7 +116,7 @@ object NumGensSpec extends Properties {
   }
 
   def testGenNonNegativeInt: Property = for {
-    n <- NumGens.genNonNegInt(NonNegInt.MaxValue).log("n")
+    n <- NumGens.genNonNegIntMaxTo(NonNegInt.MaxValue).log("n")
   } yield {
     Result.all(
       List(
@@ -138,7 +138,7 @@ object NumGensSpec extends Properties {
   }
 
   def testGenNegativeLong: Property = for {
-    n <- NumGens.genNegLong(NegLong.MinValue).log("n")
+    n <- NumGens.genNegLongMinTo(NegLong.MinValue).log("n")
   } yield {
     Result.all(
       List(
@@ -160,7 +160,7 @@ object NumGensSpec extends Properties {
   }
 
   def testGenNonPositiveLong: Property = for {
-    n <- NumGens.genNonPosLong(NonPosLong.MinValue).log("n")
+    n <- NumGens.genNonPosLongMinTo(NonPosLong.MinValue).log("n")
   } yield {
     Result.all(
       List(
@@ -182,7 +182,7 @@ object NumGensSpec extends Properties {
   }
 
   def testGenPositiveLong: Property = for {
-    n <- NumGens.genPosLong(PosLong.MaxValue).log("n")
+    n <- NumGens.genPosLongMaxTo(PosLong.MaxValue).log("n")
   } yield {
     Result.all(
       List(
@@ -204,7 +204,7 @@ object NumGensSpec extends Properties {
   }
 
   def testGenNonNegativeLong: Property = for {
-    n <- NumGens.genNonNegLong(NonNegLong.MaxValue).log("n")
+    n <- NumGens.genNonNegLongMaxTo(NonNegLong.MaxValue).log("n")
   } yield {
     Result.all(
       List(
@@ -228,7 +228,7 @@ object NumGensSpec extends Properties {
   }
 
   def testGenNegDouble: Property = for {
-    n <- NumGens.genNegDouble(NegDouble.MinValue).log("n")
+    n <- NumGens.genNegDoubleMinTo(NegDouble.MinValue).log("n")
   } yield {
     Result.all(
       List(
@@ -250,7 +250,7 @@ object NumGensSpec extends Properties {
   }
 
   def testGenNonPosDouble: Property = for {
-    n <- NumGens.genNonPosDouble(NonPosDouble.MinValue).log("n")
+    n <- NumGens.genNonPosDoubleMinTo(NonPosDouble.MinValue).log("n")
   } yield {
     Result.all(
       List(
@@ -272,7 +272,7 @@ object NumGensSpec extends Properties {
   }
 
   def testGenPosDouble: Property = for {
-    n <- NumGens.genPosDouble(PosDouble.MaxValue).log("n")
+    n <- NumGens.genPosDoubleMaxTo(PosDouble.MaxValue).log("n")
   } yield {
     Result.all(
       List(
@@ -294,7 +294,7 @@ object NumGensSpec extends Properties {
   }
 
   def testGenNonNegDouble: Property = for {
-    n <- NumGens.genNonNegDouble(NonNegDouble.MaxValue).log("n")
+    n <- NumGens.genNonNegDoubleMaxTo(NonNegDouble.MaxValue).log("n")
   } yield {
     Result.all(
       List(

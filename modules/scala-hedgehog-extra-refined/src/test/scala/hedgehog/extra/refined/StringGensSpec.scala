@@ -14,7 +14,7 @@ object StringGensSpec extends Properties {
   )
 
   def testGenNonWhitespaceString: Property = for {
-    maxLength           <- NumGens.genPosInt(PosInt(300)).log("maxLength")
+    maxLength           <- NumGens.genPosIntMaxTo(PosInt(300)).log("maxLength")
     nonWhitespaceString <- StringGens.genNonWhitespaceString(maxLength).log("nonWhitespaceString")
   } yield {
     (nonWhitespaceString.value.exists(_.isWhitespace) ==== false)
