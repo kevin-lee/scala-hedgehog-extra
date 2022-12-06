@@ -1,8 +1,7 @@
 package hedgehog.extra.refined
 
-import eu.timepit.refined._
 import eu.timepit.refined.auto._
-import eu.timepit.refined.collection.NonEmpty
+import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.string.NonEmptyString
 import hedgehog.Gen
 import hedgehog.extra.Gens
@@ -12,9 +11,9 @@ import hedgehog.extra.Gens
   */
 object StringGens {
 
-  def genNonWhitespaceString(maxLength: PositiveInt): Gen[NonEmptyString] =
+  def genNonWhitespaceString(maxLength: PosInt): Gen[NonEmptyString] =
     Gens
       .genNonWhitespaceStringUnsafe(maxLength)
-      .map(str => refineV[NonEmpty].unsafeFrom(str))
+      .map(NonEmptyString.unsafeFrom)
 
 }
