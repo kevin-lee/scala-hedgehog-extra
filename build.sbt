@@ -15,7 +15,7 @@ ThisBuild / developers := List(
 )
 ThisBuild / testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct)
 
-lazy val hedgehogExtra = Project("hedgehog-extra", file("."))
+lazy val hedgehogExtra = Project(props.ProjectName, file("."))
   .settings(
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
@@ -42,7 +42,9 @@ lazy val props =
   new {
     final val Org            = "io.kevinlee"
     final val GitHubUsername = "Kevin-Lee"
-    final val RepoName       = "scala-hedgehog-extra"
+
+    val ProjectName = "hedgehog-extra"
+    val RepoName    = "scala-" + ProjectOrigin
 
     final val ProjectScalaVersion = "2.13.6"
 //    final val ProjectScalaVersion = "3.0.0"
@@ -89,7 +91,7 @@ def removeDottyIncompatible(isScala3: Boolean, libraries: Seq[ModuleID]): Seq[Mo
 //lazy val extra =
 
 // format: off
-def prefixedProjectName(name: String) = s"${props.RepoName}${if (name.isEmpty) "" else s"-$name"}"
+def prefixedProjectName(name: String) = s"${props.ProjectName}${if (name.isEmpty) "" else s"-$name"}"
 // format: on
 
 def subProject(projectName: ProjectName): Project = {
