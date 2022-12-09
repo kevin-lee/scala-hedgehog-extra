@@ -30,9 +30,9 @@ lazy val extraRefined = subProject(ProjectName("refined"))
   .settings(
     libraryDependencies ++= (SemVer.parseUnsafe(scalaVersion.value) match {
       case SemVer(SemVer.Major(2), SemVer.Minor(11), _, _, _) =>
-        Seq("eu.timepit" %% "refined" % "0.9.12")
+        Seq("eu.timepit" %% "refined" % "0.9.12" excludeAll("org.scala-lang.modules" %% "scala-xml"))
       case _                                                  =>
-        Seq("eu.timepit" %% "refined" % "0.9.26")
+        Seq("eu.timepit" %% "refined" % "0.9.27" excludeAll("org.scala-lang.modules" %% "scala-xml"))
     }),
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
