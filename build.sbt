@@ -19,6 +19,7 @@ lazy val hedgehogExtra = Project(props.ProjectName, file("."))
   .settings(
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
+  .settings(noPublish)
   .aggregate(extraCore, extraRefined)
 
 lazy val extraCore = subProject(ProjectName("core"))
@@ -30,9 +31,9 @@ lazy val extraRefined = subProject(ProjectName("refined"))
   .settings(
     libraryDependencies ++= (SemVer.parseUnsafe(scalaVersion.value) match {
       case SemVer(SemVer.Major(2), SemVer.Minor(11), _, _, _) =>
-        Seq("eu.timepit" %% "refined" % "0.9.12" excludeAll("org.scala-lang.modules" %% "scala-xml"))
-      case _                                                  =>
-        Seq("eu.timepit" %% "refined" % "0.9.27" excludeAll("org.scala-lang.modules" %% "scala-xml"))
+        Seq("eu.timepit" %% "refined" % "0.9.12" excludeAll ("org.scala-lang.modules" %% "scala-xml"))
+      case _ =>
+        Seq("eu.timepit" %% "refined" % "0.9.27" excludeAll ("org.scala-lang.modules" %% "scala-xml"))
     }),
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
@@ -40,15 +41,16 @@ lazy val extraRefined = subProject(ProjectName("refined"))
 
 lazy val props =
   new {
-    final val Org            = "io.kevinlee"
-    final val GitHubUsername = "Kevin-Lee"
+    val Org = "io.kevinlee"
+
+    val GitHubUsername = "Kevin-Lee"
 
     val ProjectName = "hedgehog-extra"
     val RepoName    = "scala-" + ProjectOrigin
 
-    final val ProjectScalaVersion = "2.13.6"
-//    final val ProjectScalaVersion = "3.0.0"
-    final val CrossScalaVersions  =
+    val ProjectScalaVersion = "2.13.6"
+//    val ProjectScalaVersion = "3.0.0"
+    val CrossScalaVersions  =
       Seq(
         "2.11.12",
         "2.12.13",
@@ -56,7 +58,7 @@ lazy val props =
         ProjectScalaVersion
       ).distinct
 
-    final val removeDottyIncompatible: ModuleID => Boolean =
+    val removeDottyIncompatible: ModuleID => Boolean =
       m =>
         m.name == "wartremover" ||
           m.name == "ammonite" ||
@@ -64,9 +66,9 @@ lazy val props =
           m.name == "better-monadic-for" ||
           m.name == "mdoc"
 
-    final val hedgehogVersion = "0.8.0"
+    val hedgehogVersion = "0.8.0"
 
-    final val IncludeTest = "compile->compile;test->test"
+    val IncludeTest = "compile->compile;test->test"
   }
 
 lazy val libs =
@@ -152,4 +154,4 @@ def subProject(projectName: ProjectName): Project = {
     )
 }
 
-def isScala3(scalaVersion: String): Boolean = scalaVersion.startsWith("3.0")
+def isScala3(scalaVersion: String): Boolean = scalaVersion.startsWith("3.")
