@@ -9,7 +9,7 @@ import hedgehog.extra.Gens
 /** @author Kevin Lee
   * @since 2021-04-07
   */
-object StringGens {
+trait StringGens {
 
   def genNonWhitespaceString(maxLength: PosInt): Gen[NonEmptyString] =
     Gens
@@ -17,3 +17,4 @@ object StringGens {
       .map(NonEmptyString.unsafeFrom)
 
 }
+object StringGens extends StringGens
