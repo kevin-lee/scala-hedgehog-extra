@@ -6,7 +6,7 @@ import hedgehog._
 /** @author Kevin Lee
   * @since 2021-01-02
   */
-object NumGens {
+trait NumGens {
 
   def genNegInt(min: NegInt, max: NegInt): Gen[NegInt] =
     Gen.int(Range.linear(min.value, max.value)).map(NegInt.unsafeFrom)
@@ -81,3 +81,4 @@ object NumGens {
     genNonNegDouble(NonNegDouble.MinValue, max)
 
 }
+object NumGens extends NumGens
