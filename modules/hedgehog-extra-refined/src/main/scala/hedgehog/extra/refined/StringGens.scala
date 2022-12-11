@@ -13,7 +13,7 @@ object StringGens {
 
   def genNonWhitespaceString(maxLength: PosInt): Gen[NonEmptyString] =
     Gens
-      .genNonWhitespaceStringUnsafe(maxLength)
+      .genUnsafeNonWhitespaceString(maxLength)
       .map(NonEmptyString.unsafeFrom)
 
 }

@@ -24,12 +24,12 @@ object GensSpec extends Properties {
   } yield {
     (nonWhitespaceChar.isWhitespace ==== false)
       .log(s"nonSpaceChar should be non-whitespace char but it was. '${nonWhitespaceChar.toString}' (${"\\u%04x"
-        .format(nonWhitespaceChar.toInt)} / ${nonWhitespaceChar.toInt.toString})")
+          .format(nonWhitespaceChar.toInt)} / ${nonWhitespaceChar.toInt.toString})")
   }
 
   def testGenNonWhitespaceStringUnsafe: Property = for {
     maxLength           <- Gen.int(Range.linear(1, 300)).log("maxLength")
-    nonWhitespaceString <- Gens.genNonWhitespaceStringUnsafe(maxLength).log("nonWhitespaceString")
+    nonWhitespaceString <- Gens.genUnsafeNonWhitespaceString(maxLength).log("nonWhitespaceString")
   } yield {
     (nonWhitespaceString.exists(_.isWhitespace) ==== false)
       .log(
@@ -44,7 +44,7 @@ object GensSpec extends Properties {
     maxLength <- Gen.int(Range.linear(Int.MinValue, 0)).log("maxLength")
   } yield {
     try {
-      val _ = Gens.genNonWhitespaceStringUnsafe(maxLength).log("nonWhitespaceString")
+      val _ = Gens.genUnsafeNonWhitespaceString(maxLength).log("nonWhitespaceString")
       Result
         .failure
         .log(
@@ -53,7 +53,7 @@ object GensSpec extends Properties {
     } catch {
       case ex: IllegalArgumentException =>
         val expectedMessage =
-          s"maxLength for genNonWhitespaceString should be greater than 0. [maxLength: ${maxLength.toString}]"
+          s"maxLength for genUnsafeNonWhitespaceString should be a positive Int (> 0). [maxLength: ${maxLength.toString}]"
         ex.getMessage ==== expectedMessage
 
       case NonFatal(ex) =>

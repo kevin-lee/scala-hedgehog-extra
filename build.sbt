@@ -109,15 +109,15 @@ def subProject(projectName: ProjectName): Project = {
       Test / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
       //      wartremoverErrors ++= commonWarts((scalaBinaryVersion in update).value)
       //      , wartremoverErrors ++= Warts.all
-      Compile / console / wartremoverErrors := List.empty,
-      Compile / console / wartremoverWarnings := List.empty,
+//      Compile / console / wartremoverErrors := List.empty,
+//      Compile / console / wartremoverWarnings := List.empty,
       Compile / console / scalacOptions :=
         (console / scalacOptions)
           .value
           .distinct
           .filterNot(option => option.contains("wartremover") || option.contains("import")),
-      Test / console / wartremoverErrors := List.empty,
-      Test / console / wartremoverWarnings := List.empty,
+//      Test / console / wartremoverErrors := List.empty,
+//      Test / console / wartremoverWarnings := List.empty,
       Test / console / scalacOptions :=
         (console / scalacOptions)
           .value
