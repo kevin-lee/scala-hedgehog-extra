@@ -2,7 +2,6 @@ import SbtProjectInfo.{ProjectName, commonWarts}
 import just.semver.SemVer
 
 ThisBuild / scalaVersion := props.ProjectScalaVersion
-ThisBuild / version := SbtProjectInfo.ProjectVersion
 ThisBuild / organization := props.Org
 ThisBuild / organizationName := "Kevin's Code"
 ThisBuild / developers := List(
@@ -16,6 +15,7 @@ ThisBuild / developers := List(
 ThisBuild / testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct)
 
 lazy val hedgehogExtra = Project(props.ProjectName, file("."))
+  .enablePlugins(DevOopsGitHubReleasePlugin)
   .settings(
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
