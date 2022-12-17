@@ -12,6 +12,9 @@ ThisBuild / developers := List(
     url(s"https://github.com/${props.GitHubUsername}")
   )
 )
+ThisBuild / licenses   := props.Licenses
+ThisBuild / resolvers += "sonatype-snapshots" at s"https://${props.SonatypeCredentialHost}/content/repositories/snapshots"
+
 ThisBuild / testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct)
 
 lazy val hedgehogExtra = Project(props.ProjectName, file("."))
@@ -19,7 +22,9 @@ lazy val hedgehogExtra = Project(props.ProjectName, file("."))
   .settings(
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
+  .settings(mavenCentralPublishSettings)
   .settings(noPublish)
+  .settings(noDoc)
   .aggregate(extraCore, extraRefined)
 
 lazy val extraCore = subProject(ProjectName("core"))
@@ -58,6 +63,11 @@ lazy val props =
         ProjectScalaVersion
       ).distinct
 
+    val Licenses = List("MIT" -> url("http://opensource.org/licenses/MIT"))
+
+    val SonatypeCredentialHost = "s01.oss.sonatype.org"
+    val SonatypeRepository = s"https://$SonatypeCredentialHost/service/local"
+
     val removeDottyIncompatible: ModuleID => Boolean =
       m =>
         m.name == "wartremover" ||
@@ -90,7 +100,12 @@ def removeDottyIncompatible(isScala3: Boolean, libraries: Seq[ModuleID]): Seq[Mo
   else
     libraries.distinct
 
-//lazy val extra =
+lazy val mavenCentralPublishSettings: SettingsDefinition = List(
+  /* Publish to Maven Central { */
+  sonatypeCredentialHost := props.SonatypeCredentialHost,
+  sonatypeRepository     := props.SonatypeRepository,
+  /* } Publish to Maven Central */
+)
 
 // format: off
 def prefixedProjectName(name: String) = s"${props.ProjectName}${if (name.isEmpty) "" else s"-$name"}"
