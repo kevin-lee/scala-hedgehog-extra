@@ -167,6 +167,8 @@ def subProject(projectName: ProjectName): Project = {
       /* } Ammonite-REPL */
 
     )
+    .settings(mavenCentralPublishSettings)
+
 }
 
 def isScala3(scalaVersion: String): Boolean = scalaVersion.startsWith("3.")
