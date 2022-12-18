@@ -12,7 +12,7 @@ ThisBuild / developers := List(
     url(s"https://github.com/${props.GitHubUsername}")
   )
 )
-ThisBuild / licenses   := props.Licenses
+ThisBuild / licenses := props.Licenses
 ThisBuild / resolvers += "sonatype-snapshots" at s"https://${props.SonatypeCredentialHost}/content/repositories/snapshots"
 
 ThisBuild / testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct)
@@ -66,7 +66,7 @@ lazy val props =
     val Licenses = List("MIT" -> url("http://opensource.org/licenses/MIT"))
 
     val SonatypeCredentialHost = "s01.oss.sonatype.org"
-    val SonatypeRepository = s"https://$SonatypeCredentialHost/service/local"
+    val SonatypeRepository     = s"https://$SonatypeCredentialHost/service/local"
 
     val removeDottyIncompatible: ModuleID => Boolean =
       m =>
@@ -76,7 +76,7 @@ lazy val props =
           m.name == "better-monadic-for" ||
           m.name == "mdoc"
 
-    val hedgehogVersion = "0.8.0"
+    val HedgehogVersion = "0.9.0"
 
     val IncludeTest = "compile->compile;test->test"
   }
@@ -84,13 +84,13 @@ lazy val props =
 lazy val libs =
   new {
     lazy val hedgehogLibs = Seq(
-      "qa.hedgehog" %% "hedgehog-core"   % props.hedgehogVersion,
-      "qa.hedgehog" %% "hedgehog-runner" % props.hedgehogVersion
+      "qa.hedgehog" %% "hedgehog-core"   % props.HedgehogVersion,
+      "qa.hedgehog" %% "hedgehog-runner" % props.HedgehogVersion
     )
 
     lazy val hedgehogLibsForTesting =
       (hedgehogLibs ++ Seq(
-        "qa.hedgehog" %% "hedgehog-sbt" % props.hedgehogVersion
+        "qa.hedgehog" %% "hedgehog-sbt" % props.HedgehogVersion
       )).map(_ % Test)
   }
 
@@ -103,7 +103,7 @@ def removeDottyIncompatible(isScala3: Boolean, libraries: Seq[ModuleID]): Seq[Mo
 lazy val mavenCentralPublishSettings: SettingsDefinition = List(
   /* Publish to Maven Central { */
   sonatypeCredentialHost := props.SonatypeCredentialHost,
-  sonatypeRepository     := props.SonatypeRepository,
+  sonatypeRepository := props.SonatypeRepository,
   /* } Publish to Maven Central */
 )
 
