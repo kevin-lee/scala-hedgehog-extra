@@ -12,6 +12,16 @@ ThisBuild / developers := List(
     url(s"https://github.com/${props.GitHubUsername}")
   )
 )
+
+ThisBuild / homepage   := Some(url(s"https://github.com/${props.GitHubUsername}/${props.RepoName}"))
+ThisBuild / scmInfo    :=
+  Some(
+    ScmInfo(
+      url(s"https://github.com/${props.GitHubUsername}/${props.RepoName}"),
+      s"git@github.com:${props.GitHubUsername}/${props.RepoName}.git",
+    )
+  )
+
 ThisBuild / licenses := props.Licenses
 ThisBuild / resolvers += "sonatype-snapshots" at s"https://${props.SonatypeCredentialHost}/content/repositories/snapshots"
 
