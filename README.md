@@ -5,9 +5,9 @@
 [![codecov](https://codecov.io/gh/Kevin-Lee/scala-hedgehog-extra/branch/main/graph/badge.svg?token=AxSbGPSGaC)](https://codecov.io/gh/Kevin-Lee/scala-hedgehog-extra)
 
 ```sbt
-"io.kevinlee" %% "hedgehog-extra-core" % "0.1.0"
+"io.kevinlee" %% "hedgehog-extra-core" % "0.3.0"
 ```
 
 ```sbt
-"io.kevinlee" %% "hedgehog-extra-refined" % "0.1.0"
+"io.kevinlee" %% "hedgehog-extra-refined" % "0.3.0"
 ```
