@@ -37,14 +37,15 @@ object TimeGensSpec extends Properties {
 
   def testGenMonthMinMax: Property =
     for {
-      (min, max) <- extra
-                      .NumGens
-                      .genIntMinMaxPair(1, 12)
-                      .map {
-                        case (min, max) => (Month.unsafeFrom(min), Month.unsafeFrom(max))
-                      }
-                      .log("(min, max)")
-      actual     <- TimeGens.genMonthMinMax(min, max).log("actual")
+      minAndMax <- extra
+                     .NumGens
+                     .genIntMinMaxPair(1, 12)
+                     .map {
+                       case (min, max) => (Month.unsafeFrom(min), Month.unsafeFrom(max))
+                     }
+                     .log("(min, max)")
+      (min, max) = minAndMax
+      actual <- TimeGens.genMonthMinMax(min, max).log("actual")
     } yield Result.all(
       List(
         Result
@@ -62,10 +63,10 @@ object TimeGensSpec extends Properties {
     } yield Result.all(
       List(
         Result
-          .diffNamed(s"actual should be >= 1", actual, Month(1))(_.value >= _.value)
+          .diffNamed(s"actual should be >= 1", actual, Month.unsafeFrom(1))(_.value >= _.value)
           .log(s"actual: ${actual.value.toString}, min: 1"),
         Result
-          .diffNamed(s"actual should be <= 12", actual, Month(12))(_.value <= _.value)
+          .diffNamed(s"actual should be <= 12", actual, Month.unsafeFrom(12))(_.value <= _.value)
           .log(s"actual: ${actual.value.toString}, max: 12")
       )
     )
@@ -80,14 +81,15 @@ object TimeGensSpec extends Properties {
 
   def testGenDayMinMax: Property =
     for {
-      (min, max) <- extra
-                      .NumGens
-                      .genIntMinMaxPair(1, 12)
-                      .map {
-                        case (min, max) => (Day.unsafeFrom(min), Day.unsafeFrom(max))
-                      }
-                      .log("(min, max)")
-      actual     <- TimeGens.genDayMinMax(min, max).log("actual")
+      minAndMax <- extra
+                     .NumGens
+                     .genIntMinMaxPair(1, 12)
+                     .map {
+                       case (min, max) => (Day.unsafeFrom(min), Day.unsafeFrom(max))
+                     }
+                     .log("(min, max)")
+      (min, max) = minAndMax
+      actual <- TimeGens.genDayMinMax(min, max).log("actual")
     } yield Result.all(
       List(
         Result
@@ -105,10 +107,10 @@ object TimeGensSpec extends Properties {
     } yield Result.all(
       List(
         Result
-          .diffNamed(s"actual should be >= 1", actual, Day(1))(_.value >= _.value)
+          .diffNamed(s"actual should be >= 1", actual, Day.unsafeFrom(1))(_.value >= _.value)
           .log(s"actual: ${actual.value.toString}, min: 1"),
         Result
-          .diffNamed(s"actual should be <= 31", actual, Day(31))(_.value <= _.value)
+          .diffNamed(s"actual should be <= 31", actual, Day.unsafeFrom(31))(_.value <= _.value)
           .log(s"actual: ${actual.value.toString}, max: 31")
       )
     )
@@ -123,14 +125,15 @@ object TimeGensSpec extends Properties {
 
   def testGenHourMinMax: Property =
     for {
-      (min, max) <- extra
-                      .NumGens
-                      .genIntMinMaxPair(0, 23)
-                      .map {
-                        case (min, max) => (Hour.unsafeFrom(min), Hour.unsafeFrom(max))
-                      }
-                      .log("(min, max)")
-      actual     <- TimeGens.genHourMinMax(min, max).log("actual")
+      minAndMax <- extra
+                     .NumGens
+                     .genIntMinMaxPair(0, 23)
+                     .map {
+                       case (min, max) => (Hour.unsafeFrom(min), Hour.unsafeFrom(max))
+                     }
+                     .log("(min, max)")
+      (min, max) = minAndMax
+      actual <- TimeGens.genHourMinMax(min, max).log("actual")
     } yield Result.all(
       List(
         Result
@@ -148,10 +151,10 @@ object TimeGensSpec extends Properties {
     } yield Result.all(
       List(
         Result
-          .diffNamed(s"actual should be >= 0", actual, Hour(0))(_.value >= _.value)
+          .diffNamed(s"actual should be >= 0", actual, Hour.unsafeFrom(0))(_.value >= _.value)
           .log(s"actual: ${actual.value.toString}, min: 0"),
         Result
-          .diffNamed(s"actual should be <= 23", actual, Hour(23))(_.value <= _.value)
+          .diffNamed(s"actual should be <= 23", actual, Hour.unsafeFrom(23))(_.value <= _.value)
           .log(s"actual: ${actual.value.toString}, max: 23")
       )
     )
@@ -166,14 +169,15 @@ object TimeGensSpec extends Properties {
 
   def testGenMinuteMinMax: Property =
     for {
-      (min, max) <- extra
-                      .NumGens
-                      .genIntMinMaxPair(0, 59)
-                      .map {
-                        case (min, max) => (Minute.unsafeFrom(min), Minute.unsafeFrom(max))
-                      }
-                      .log("(min, max)")
-      actual     <- TimeGens.genMinuteMinMax(min, max).log("actual")
+      minAndMax <- extra
+                     .NumGens
+                     .genIntMinMaxPair(0, 59)
+                     .map {
+                       case (min, max) => (Minute.unsafeFrom(min), Minute.unsafeFrom(max))
+                     }
+                     .log("(min, max)")
+      (min, max) = minAndMax
+      actual <- TimeGens.genMinuteMinMax(min, max).log("actual")
     } yield Result.all(
       List(
         Result
@@ -191,10 +195,10 @@ object TimeGensSpec extends Properties {
     } yield Result.all(
       List(
         Result
-          .diffNamed(s"actual should be >= 0", actual, Minute(0))(_.value >= _.value)
+          .diffNamed(s"actual should be >= 0", actual, Minute.unsafeFrom(0))(_.value >= _.value)
           .log(s"actual: ${actual.value.toString}, min: 0"),
         Result
-          .diffNamed(s"actual should be <= 59", actual, Minute(59))(_.value <= _.value)
+          .diffNamed(s"actual should be <= 59", actual, Minute.unsafeFrom(59))(_.value <= _.value)
           .log(s"actual: ${actual.value.toString}, max: 59")
       )
     )
@@ -209,14 +213,15 @@ object TimeGensSpec extends Properties {
 
   def testGenSecondMinMax: Property =
     for {
-      (min, max) <- extra
-                      .NumGens
-                      .genIntMinMaxPair(0, 59)
-                      .map {
-                        case (min, max) => (Second.unsafeFrom(min), Second.unsafeFrom(max))
-                      }
-                      .log("(min, max)")
-      actual     <- TimeGens.genSecondMinMax(min, max).log("actual")
+      minAndMax <- extra
+                     .NumGens
+                     .genIntMinMaxPair(0, 59)
+                     .map {
+                       case (min, max) => (Second.unsafeFrom(min), Second.unsafeFrom(max))
+                     }
+                     .log("(min, max)")
+      (min, max) = minAndMax
+      actual <- TimeGens.genSecondMinMax(min, max).log("actual")
     } yield Result.all(
       List(
         Result
@@ -234,10 +239,10 @@ object TimeGensSpec extends Properties {
     } yield Result.all(
       List(
         Result
-          .diffNamed(s"actual should be >= 0", actual, Second(0))(_.value >= _.value)
+          .diffNamed(s"actual should be >= 0", actual, Second.unsafeFrom(0))(_.value >= _.value)
           .log(s"actual: ${actual.value.toString}, min: 0"),
         Result
-          .diffNamed(s"actual should be <= 59", actual, Second(59))(_.value <= _.value)
+          .diffNamed(s"actual should be <= 59", actual, Second.unsafeFrom(59))(_.value <= _.value)
           .log(s"actual: ${actual.value.toString}, max: 59")
       )
     )
@@ -252,14 +257,15 @@ object TimeGensSpec extends Properties {
 
   def testGenMillisMinMax: Property =
     for {
-      (min, max) <- extra
-                      .NumGens
-                      .genIntMinMaxPair(0, 999)
-                      .map {
-                        case (min, max) => (Millis.unsafeFrom(min), Millis.unsafeFrom(max))
-                      }
-                      .log("(min, max)")
-      actual     <- TimeGens.genMillisMinMax(min, max).log("actual")
+      minAndMax <- extra
+                     .NumGens
+                     .genIntMinMaxPair(0, 999)
+                     .map {
+                       case (min, max) => (Millis.unsafeFrom(min), Millis.unsafeFrom(max))
+                     }
+                     .log("(min, max)")
+      (min, max) = minAndMax
+      actual <- TimeGens.genMillisMinMax(min, max).log("actual")
     } yield Result.all(
       List(
         Result
@@ -277,10 +283,10 @@ object TimeGensSpec extends Properties {
     } yield Result.all(
       List(
         Result
-          .diffNamed(s"actual should be >= 0", actual, Millis(0))(_.value >= _.value)
+          .diffNamed(s"actual should be >= 0", actual, Millis.unsafeFrom(0))(_.value >= _.value)
           .log(s"actual: ${actual.value.toString}, min: 0"),
         Result
-          .diffNamed(s"actual should be <= 999", actual, Millis(999))(_.value <= _.value)
+          .diffNamed(s"actual should be <= 999", actual, Millis.unsafeFrom(999))(_.value <= _.value)
           .log(s"actual: ${actual.value.toString}, max: 999")
       )
     )

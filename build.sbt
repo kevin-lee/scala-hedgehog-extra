@@ -13,8 +13,8 @@ ThisBuild / developers := List(
   )
 )
 
-ThisBuild / homepage   := Some(url(s"https://github.com/${props.GitHubUsername}/${props.RepoName}"))
-ThisBuild / scmInfo    :=
+ThisBuild / homepage := Some(url(s"https://github.com/${props.GitHubUsername}/${props.RepoName}"))
+ThisBuild / scmInfo :=
   Some(
     ScmInfo(
       url(s"https://github.com/${props.GitHubUsername}/${props.RepoName}"),
@@ -30,7 +30,7 @@ ThisBuild / testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework
 ThisBuild / scalafixConfig := (
   if (scalaVersion.value.startsWith("3")) file(".scalafix-scala3.conf").some
   else file(".scalafix-scala2.conf").some
-  )
+)
 
 ThisBuild / scalafixScalaBinaryVersion := {
   val log        = sLog.value
@@ -66,6 +66,10 @@ lazy val extraCore = subProject(ProjectName("core"))
 lazy val extraRefined = subProject(ProjectName("refined"))
   .settings(
     libraryDependencies ++= (SemVer.parseUnsafe(scalaVersion.value) match {
+      case SemVer(SemVer.Major(3), SemVer.Minor(mn), _, _, _) if mn >= 2 =>
+        Seq("eu.timepit" %% "refined" % "0.10.2")
+      case SemVer(SemVer.Major(3), SemVer.Minor(1), _, _, _) =>
+        Seq("eu.timepit" %% "refined" % "0.10.1")
       case SemVer(SemVer.Major(2), SemVer.Minor(11), _, _, _) =>
         Seq("eu.timepit" %% "refined" % "0.9.12" excludeAll ("org.scala-lang.modules" %% "scala-xml"))
       case _ =>
@@ -84,14 +88,17 @@ lazy val props =
     val ProjectName = "hedgehog-extra"
     val RepoName    = "scala-" + ProjectOrigin
 
-    val ProjectScalaVersion = "2.13.6"
-//    val ProjectScalaVersion = "3.0.0"
+    val Scala2Version = "2.13.6"
+    val Scala3Version = "3.0.2"
+
+    val ProjectScalaVersion = Scala3Version
+//    val ProjectScalaVersion = Scala2Version
     val CrossScalaVersions  =
       Seq(
         "2.11.12",
         "2.12.13",
-        "2.13.6",
-        ProjectScalaVersion
+        Scala2Version,
+        Scala3Version,
       ).distinct
 
     val Licenses = List("MIT" -> url("http://opensource.org/licenses/MIT"))
@@ -102,7 +109,7 @@ lazy val props =
     val removeDottyIncompatible: ModuleID => Boolean =
       m =>
         m.name == "wartremover" ||
-          m.name == "ammonite" ||
+//          m.name == "ammonite" ||
           m.name == "kind-projector" ||
           m.name == "better-monadic-for" ||
           m.name == "mdoc"
@@ -110,6 +117,10 @@ lazy val props =
     val HedgehogVersion = "0.9.0"
 
     val IncludeTest = "compile->compile;test->test"
+
+    val isScala3IncompatibleScalacOption: String => Boolean =
+      _.startsWith("-P:wartremover")
+
   }
 
 lazy val libs =
@@ -154,13 +165,14 @@ def subProject(projectName: ProjectName): Project = {
           ((ThisBuild / baseDirectory).value / ".scalafix-scala3.conf").some
         else
           ((ThisBuild / baseDirectory).value / ".scalafix-scala2.conf").some
-        ),
+      ),
       crossScalaVersions := props.CrossScalaVersions,
       testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
       libraryDependencies ++= libs.hedgehogLibs ++ libs.hedgehogLibsForTesting,
       /* WartRemover and scalacOptions { */
-      Compile / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
-      Test / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
+//      Compile / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
+//      Test / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
+      wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
       //      wartremoverErrors ++= commonWarts((scalaBinaryVersion in update).value)
       //      , wartremoverErrors ++= Warts.all
 //      Compile / console / wartremoverErrors := List.empty,
@@ -179,25 +191,31 @@ def subProject(projectName: ProjectName): Project = {
           .filterNot(option => option.contains("wartremover") || option.contains("import")),
       /* } WartRemover and scalacOptions */
       /* Ammonite-REPL { */
-      libraryDependencies ++=
-        (scalaBinaryVersion.value match {
+      scalacOptions ~= (_.filterNot(props.isScala3IncompatibleScalacOption)),
+      libraryDependencies ++= {
+        scalaBinaryVersion.value match {
           case "2.10" =>
-            Seq.empty[ModuleID]
+            Seq("com.lihaoyi" % "ammonite" % "1.0.3" % Test cross CrossVersion.full)
           case "2.11" =>
             Seq("com.lihaoyi" % "ammonite" % "1.6.7" % Test cross CrossVersion.full)
-          case "2.12" | "2.13" | "3" =>
-            Seq("com.lihaoyi" % "ammonite" % "2.5.3" % Test cross CrossVersion.full)
+          case "3" =>
+            Seq.empty
           case _ =>
-            Seq.empty[ModuleID]
-        }),
+            Seq("com.lihaoyi" % "ammonite" % "3.0.0-M0" % Test cross CrossVersion.full)
+        }
+      },
       Test / sourceGenerators +=
         (scalaBinaryVersion.value match {
           case "2.10" | "2.11" =>
             task(Seq.empty[File])
-          case "2.12" | "2.13" | "3" =>
+//          case "2.12" | "2.13" | "3" =>
+          case "2.12" | "2.13" =>
             task {
               val file = (Test / sourceManaged).value / "amm.scala"
-              IO.write(file, """object amm extends App { ammonite.AmmoniteMain.main(args) }""")
+              IO.write(
+                file,
+                """object amm extends App { ammonite.AmmoniteMain.main(args) }"""
+              )
               Seq(file)
             }
           case _ =>

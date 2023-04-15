@@ -14,12 +14,14 @@ object NumGensSpec extends Properties {
 
   def testGenIntMinMaxPair: Property =
     for {
-      (min, max) <- NumGens.genIntMinMaxPair(Int.MinValue, Int.MaxValue).log("(min, max)")
+      minAndMax <- NumGens.genIntMinMaxPair(Int.MinValue, Int.MaxValue).log("(min, max)")
+      (min, max) = minAndMax
     } yield Result.diffNamed("(min, max) should be min <= max", min, max)(_ <= _)
 
   def testGenLongMinMaxPair: Property =
     for {
-      (min, max) <- NumGens.genLongMinMaxPair(Long.MinValue, Long.MaxValue).log("(min, max)")
+      minAndMax <- NumGens.genLongMinMaxPair(Long.MinValue, Long.MaxValue).log("(min, max)")
+      (min, max) = minAndMax
     } yield Result.diffNamed("(min, max) should be min <= max", min, max)(_ <= _)
 
 }

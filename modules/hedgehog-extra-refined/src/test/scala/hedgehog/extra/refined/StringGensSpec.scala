@@ -16,7 +16,7 @@ object StringGensSpec extends Properties {
   )
 
   def testGenNonWhitespaceString: Property = for {
-    maxLength           <- NumGens.genPosIntMaxTo(PosInt(300)).log("maxLength")
+    maxLength           <- NumGens.genPosIntMaxTo(PosInt.unsafeFrom(300)).log("maxLength")
     nonWhitespaceString <- StringGens.genNonWhitespaceString(maxLength).log("nonWhitespaceString")
   } yield {
     (nonWhitespaceString.value.exists(_.isWhitespace) ==== false)
@@ -29,7 +29,7 @@ object StringGensSpec extends Properties {
   }
 
   def testGenNonEmptyStringAlphaNum: Property = for {
-    maxLength      <- NumGens.genPosIntMaxTo(PosInt(300)).log("maxLength")
+    maxLength      <- NumGens.genPosIntMaxTo(PosInt.unsafeFrom(300)).log("maxLength")
     nonEmptyString <- StringGens.genNonEmptyString(Gen.alphaNum, maxLength).log("nonEmptyString")
   } yield {
     Result.all(
@@ -49,7 +49,7 @@ object StringGensSpec extends Properties {
   }
 
   def testGenNonEmptyStringUnicode: Property = for {
-    maxLength      <- NumGens.genPosIntMaxTo(PosInt(300)).log("maxLength")
+    maxLength      <- NumGens.genPosIntMaxTo(PosInt.unsafeFrom(300)).log("maxLength")
     nonEmptyString <- StringGens.genNonEmptyString(Gen.unicodeAll, maxLength).log("nonEmptyString")
   } yield {
     Result
