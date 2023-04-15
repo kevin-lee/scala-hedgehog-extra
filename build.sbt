@@ -27,6 +27,27 @@ ThisBuild / resolvers += "sonatype-snapshots" at s"https://${props.SonatypeCrede
 
 ThisBuild / testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct)
 
+ThisBuild / scalafixConfig := (
+  if (scalaVersion.value.startsWith("3")) file(".scalafix-scala3.conf").some
+  else file(".scalafix-scala2.conf").some
+  )
+
+ThisBuild / scalafixScalaBinaryVersion := {
+  val log        = sLog.value
+  val newVersion = if (scalaVersion.value.startsWith("3")) {
+    (ThisBuild / scalafixScalaBinaryVersion).value
+  } else {
+    CrossVersion.binaryScalaVersion(scalaVersion.value)
+  }
+
+  log.info(
+    s">> Change ThisBuild / scalafixScalaBinaryVersion from ${(ThisBuild / scalafixScalaBinaryVersion).value} to $newVersion"
+  )
+  newVersion
+}
+
+ThisBuild / scalafixDependencies += "com.github.xuwei-k" %% "scalafix-rules" % "0.2.15"
+
 lazy val hedgehogExtra = Project(props.ProjectName, file("."))
   .enablePlugins(DevOopsGitHubReleasePlugin)
   .settings(
@@ -126,6 +147,14 @@ def subProject(projectName: ProjectName): Project = {
   Project(prefixedName, file(s"modules/$prefixedName"))
     .settings(
       name := prefixedName,
+      semanticdbEnabled := true,
+      semanticdbVersion := scalafixSemanticdb.revision,
+      scalafixConfig := (
+        if (scalaVersion.value.startsWith("3"))
+          ((ThisBuild / baseDirectory).value / ".scalafix-scala3.conf").some
+        else
+          ((ThisBuild / baseDirectory).value / ".scalafix-scala2.conf").some
+        ),
       crossScalaVersions := props.CrossScalaVersions,
       testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
       libraryDependencies ++= libs.hedgehogLibs ++ libs.hedgehogLibsForTesting,

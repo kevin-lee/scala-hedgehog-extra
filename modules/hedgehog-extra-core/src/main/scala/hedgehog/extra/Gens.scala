@@ -26,7 +26,7 @@ trait Gens {
         Range.linear(1, maxLength)
       )
     else
-      throw new IllegalArgumentException(
+      throw new IllegalArgumentException( // scalafix:ok DisableSyntax.throw
         s"maxLength for genUnsafeNonWhitespaceString should be a positive Int (> 0). [maxLength: ${maxLength.toString}]"
       )
 

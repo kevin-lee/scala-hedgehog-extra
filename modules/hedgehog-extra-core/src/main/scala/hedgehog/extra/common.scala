@@ -5,7 +5,7 @@ package hedgehog.extra
   */
 object common {
 
-  final val NonWhitespaceCharRange: List[(Int, Int)] = List(
+  final val NonWhitespaceCharRange: List[(Int, Int)] = List( // scalafix:ok DisableSyntax.noFinalVal
     0     -> 8,
     14    -> 27,
     33    -> 5759,

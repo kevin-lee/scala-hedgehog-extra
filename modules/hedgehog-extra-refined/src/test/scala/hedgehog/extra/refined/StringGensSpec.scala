@@ -36,7 +36,9 @@ object StringGensSpec extends Properties {
       List(
         Result
           .assert(nonEmptyString.value.nonEmpty)
-          .log(s"nonEmptyString should not be empty. nonEmptyString.value.nonEmpty: ${nonEmptyString.value.nonEmpty.toString}"),
+          .log(
+            s"nonEmptyString should not be empty. nonEmptyString.value.nonEmpty: ${nonEmptyString.value.nonEmpty.toString}"
+          ),
         Result
           .assert(
             nonEmptyString.value.forall(c => c.isDigit || ('a' to 'z').contains(c) || ('A' to 'Z').contains(c))
@@ -52,7 +54,9 @@ object StringGensSpec extends Properties {
   } yield {
     Result
       .assert(nonEmptyString.value.nonEmpty)
-      .log(s"nonEmptyString should not be empty. nonEmptyString.value.nonEmpty: ${nonEmptyString.value.nonEmpty.toString}")
+      .log(
+        s"nonEmptyString should not be empty. nonEmptyString.value.nonEmpty: ${nonEmptyString.value.nonEmpty.toString}"
+      )
   }
 
 }
