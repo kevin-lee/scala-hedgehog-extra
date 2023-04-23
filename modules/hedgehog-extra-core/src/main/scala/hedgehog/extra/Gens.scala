@@ -30,5 +30,24 @@ trait Gens {
         s"maxLength for genUnsafeNonWhitespaceString should be a positive Int (> 0). [maxLength: ${maxLength.toString}]"
       )
 
+  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
+  def genUnsafeNonWhitespaceStringMinMax(minLength: Int, maxLength: Int): Gen[String] =
+    if (minLength > 0) {
+      if (minLength <= maxLength)
+        Gen.string(
+          genNonWhitespaceChar,
+          Range.linear(minLength, maxLength)
+        )
+      else
+        throw new IllegalArgumentException( // scalafix:ok DisableSyntax.throw
+          "maxLength for genUnsafeNonWhitespaceStringMinMax is less than minLength. " +
+            "maxLength for genUnsafeNonWhitespaceStringMinMax should be greater than or equal to minLength (minLength <= maxLength). " +
+            s"[minLength: ${minLength.toString}, maxLength: ${maxLength.toString}]"
+        )
+    } else
+      throw new IllegalArgumentException( // scalafix:ok DisableSyntax.throw
+        s"minLength for genUnsafeNonWhitespaceStringMinMax should be a positive Int (> 0). [minLength: ${minLength.toString}]"
+      )
+
 }
 object Gens extends Gens
