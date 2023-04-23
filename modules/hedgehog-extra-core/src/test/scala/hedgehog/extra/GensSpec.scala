@@ -16,6 +16,15 @@ object GensSpec extends Properties {
     property(
       "testGenNonWhitespaceStringUnsafeWithNonPositiveMaxLength",
       testGenNonWhitespaceStringUnsafeWithNonPositiveMaxLength
+    ).withTests(1000),
+    property("test genUnsafeNonWhitespaceStringMinMax", testGenUnsafeNonWhitespaceStringMinMax).withTests(10000),
+    property(
+      "test genUnsafeNonWhitespaceStringMinMax with non-positive minLength",
+      testGenUnsafeNonWhitespaceStringMinMaxWithNonPositiveMinLength
+    ).withTests(1000),
+    property(
+      "test genUnsafeNonWhitespaceStringMinMax with minLength > maxLength",
+      testGenUnsafeNonWhitespaceStringMinMaxWithMinLengthGreaterThanMaxLength
     ).withTests(1000)
   )
 
@@ -54,6 +63,79 @@ object GensSpec extends Properties {
       case ex: IllegalArgumentException =>
         val expectedMessage =
           s"maxLength for genUnsafeNonWhitespaceString should be a positive Int (> 0). [maxLength: ${maxLength.toString}]"
+        ex.getMessage ==== expectedMessage
+
+      case NonFatal(ex) =>
+        Result
+          .failure
+          .log(
+            s"""IllegalArgumentException was expected but ${ex.getClass.getSimpleName} was thrown instead.
+               |  ex: ${ex.getMessage}
+               |""".stripMargin
+          )
+    }
+  }
+
+  def testGenUnsafeNonWhitespaceStringMinMax: Property = for {
+    minLength <- Gen.int(Range.linear(1, 10)).log("minLength")
+    maxLength <- Gen.int(Range.linear(minLength, 300)).log("maxLength")
+
+    nonWhitespaceString <- Gens.genUnsafeNonWhitespaceStringMinMax(minLength, maxLength).log("nonWhitespaceString")
+  } yield {
+    (nonWhitespaceString.exists(_.isWhitespace) ==== false)
+      .log(
+        s"nonWhitespaceString should not contain any whitespace char but it has. " +
+          s"'$nonWhitespaceString' " +
+          s"(${nonWhitespaceString.map(c => "\\u%04x".format(c.toInt)).mkString} / " +
+          s"${nonWhitespaceString.map(_.toInt).mkString("[", ",", "]")})"
+      )
+  }
+
+  def testGenUnsafeNonWhitespaceStringMinMaxWithNonPositiveMinLength: Property = for {
+    minLength <- Gen.int(Range.linear(Int.MinValue, 0)).log("minLength")
+    maxLength <- Gen.int(Range.linear(1, 300)).log("maxLength")
+  } yield {
+    try {
+      val _ = Gens.genUnsafeNonWhitespaceStringMinMax(minLength, maxLength).log("nonWhitespaceString")
+      Result
+        .failure
+        .log(
+          "IllegalArgumentException was expected but nothing was thrown."
+        )
+    } catch {
+      case ex: IllegalArgumentException =>
+        val expectedMessage =
+          s"minLength for genUnsafeNonWhitespaceStringMinMax should be a positive Int (> 0). [minLength: ${minLength.toString}]"
+        ex.getMessage ==== expectedMessage
+
+      case NonFatal(ex) =>
+        Result
+          .failure
+          .log(
+            s"""IllegalArgumentException was expected but ${ex.getClass.getSimpleName} was thrown instead.
+               |  ex: ${ex.getMessage}
+               |""".stripMargin
+          )
+    }
+  }
+
+  def testGenUnsafeNonWhitespaceStringMinMaxWithMinLengthGreaterThanMaxLength: Property = for {
+    minLength <- Gen.int(Range.linear(301, 1000)).log("minLength")
+    maxLength <- Gen.int(Range.linear(1, 300)).log("maxLength")
+  } yield {
+    try {
+      val _ = Gens.genUnsafeNonWhitespaceStringMinMax(minLength, maxLength).log("nonWhitespaceString")
+      Result
+        .failure
+        .log(
+          "IllegalArgumentException was expected but nothing was thrown."
+        )
+    } catch {
+      case ex: IllegalArgumentException =>
+        val expectedMessage =
+          "maxLength for genUnsafeNonWhitespaceStringMinMax is less than minLength. " +
+            "maxLength for genUnsafeNonWhitespaceStringMinMax should be greater than or equal to minLength (minLength <= maxLength). " +
+            s"[minLength: ${minLength.toString}, maxLength: ${maxLength.toString}]"
         ex.getMessage ==== expectedMessage
 
       case NonFatal(ex) =>
