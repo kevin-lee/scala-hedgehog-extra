@@ -16,6 +16,11 @@ trait StringGens {
       .genUnsafeNonWhitespaceString(maxLength)
       .map(NonEmptyString.unsafeFrom)
 
+  def genNonWhitespaceStringMinMax(minLength: PosInt, maxLength: PosInt): Gen[NonEmptyString] =
+    Gens
+      .genUnsafeNonWhitespaceStringMinMax(minLength, maxLength)
+      .map(NonEmptyString.unsafeFrom)
+
   def genNonEmptyString(charGen: Gen[Char], maxLength: PosInt): Gen[NonEmptyString] =
     Gen.string(charGen, Range.linear(1, maxLength.value)).map(NonEmptyString.unsafeFrom)
 

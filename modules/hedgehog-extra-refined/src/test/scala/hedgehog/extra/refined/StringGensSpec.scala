@@ -11,6 +11,7 @@ object StringGensSpec extends Properties {
 
   override def tests: List[Test] = List(
     property("test StringGens.genNonWhitespaceString", testGenNonWhitespaceString).withTests(10000),
+    property("test StringGens.genNonWhitespaceStringMinMax", testGenNonWhitespaceStringMinMax).withTests(10000),
     property("test StringGens.genNonEmptyString with Gen.alphaNum", testGenNonEmptyStringAlphaNum).withTests(10000),
     property("test StringGens.genNonEmptyString with Gen.unicode", testGenNonEmptyStringUnicode).withTests(10000),
     property("test StringGens.genNonEmptyStringMinMax with Gen.alphaNum", testGenNonEmptyStringMinMaxAlphaNum)
@@ -31,6 +32,30 @@ object StringGensSpec extends Properties {
           s"(${nonWhitespaceString.value.map(c => "\\u%04x".format(c.toInt)).mkString} / " +
           s"${nonWhitespaceString.value.map(_.toInt).mkString("[", ",", "]")})"
       )
+  }
+
+  def testGenNonWhitespaceStringMinMax: Property = for {
+    minLength <- NumGens.genPosIntMaxTo(PosInt.unsafeFrom(10)).log("minLength")
+    maxLength <- NumGens.genPosInt(minLength, PosInt.unsafeFrom(300)).log("maxLength")
+
+    nonWhitespaceString <- StringGens.genNonWhitespaceStringMinMax(minLength, maxLength).log("nonWhitespaceString")
+  } yield {
+    Result.all(
+      List(
+        (nonWhitespaceString.value.exists(_.isWhitespace) ==== false)
+          .log(
+            s"nonWhitespaceString should not contain any whitespace char but it has. " +
+              s"'${nonWhitespaceString.value}' " +
+              s"(${nonWhitespaceString.value.map(c => "\\u%04x".format(c.toInt)).mkString} / " +
+              s"${nonWhitespaceString.value.map(_.toInt).mkString("[", ",", "]")})"
+          ),
+        Result.diffNamed(
+          s"The length of nonWhitespaceString should be ${minLength.value.toString} <= length <= ${maxLength.value.toString}",
+          minLength.value to maxLength.value,
+          nonWhitespaceString.value.length
+        )((range, actual) => range.exists(_ == actual))
+      )
+    )
   }
 
   def testGenNonEmptyStringAlphaNum: Property = for {
