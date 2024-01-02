@@ -56,7 +56,7 @@ lazy val hedgehogExtra = Project(props.ProjectName, file("."))
   .settings(mavenCentralPublishSettings)
   .settings(noPublish)
   .settings(noDoc)
-  .aggregate(extraCore, extraRefined)
+  .aggregate(extraCore, extraRefined, extraUtil)
 
 lazy val extraCore = subProject(ProjectName("core"))
   .settings(
@@ -78,6 +78,12 @@ lazy val extraRefined = subProject(ProjectName("refined"))
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
   .dependsOn(extraCore)
+
+lazy val extraUtil = subProject(ProjectName("util"))
+  .settings(
+    libraryDependencies ++= Seq("com.sanctionco.jmail" % "jmail" % "1.4.1"),
+    libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
+  )
 
 lazy val props =
   new {
