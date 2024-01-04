@@ -54,15 +54,23 @@ lazy val hedgehogExtra = Project(props.ProjectName, file("."))
   .settings(mavenCentralPublishSettings)
   .settings(noPublish)
   .settings(noDoc)
-  .aggregate(extraCore, extraRefined)
+  .aggregate(
+    extraCore,
+    extraRefined,
+    extraRefined4s,
+  )
 
 lazy val extraCore = subProject(ProjectName("core"))
   .settings(
+    crossScalaVersions := props.CrossScalaVersions,
+    libraryDependencies ++= libs.hedgehogLibs ++ libs.hedgehogLibsForTesting,
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
 
 lazy val extraRefined = subProject(ProjectName("refined"))
   .settings(
+    crossScalaVersions := props.CrossScalaVersions,
+    libraryDependencies ++= libs.hedgehogLibs ++ libs.hedgehogLibsForTesting,
     libraryDependencies ++= (SemVer.parseUnsafe(scalaVersion.value) match {
       case SemVer(SemVer.Major(3), SemVer.Minor(mn), _, _, _) if mn >= 2 =>
         Seq("eu.timepit" %% "refined" % "0.10.2")
@@ -76,6 +84,24 @@ lazy val extraRefined = subProject(ProjectName("refined"))
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
   .dependsOn(extraCore)
+
+lazy val extraRefined4s = subProject(ProjectName("refined4s"))
+  .settings(
+    scalaVersion := props.Scala3Version,
+    crossScalaVersions := Seq.empty,
+    libraryDependencies ++=
+      (SemVer.parseUnsafe(scalaVersion.value) match {
+        case SemVer(SemVer.Major(3), SemVer.Minor(mn), _, _, _) if mn >= 1 =>
+          Seq(
+            libs.refined4sCore,
+            libs.refined4sCats % Test,
+          )
+        case _ =>
+          Seq.empty
+      }),
+    libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
+  )
+  .dependsOn(extraCore % props.IncludeTest)
 
 lazy val props =
   new {
@@ -114,6 +140,8 @@ lazy val props =
 
     val HedgehogVersion = "0.10.1"
 
+    val Refined4sVersion = "0.11.0"
+
     val IncludeTest = "compile->compile;test->test"
 
     val isScala3IncompatibleScalacOption: String => Boolean =
@@ -128,10 +156,13 @@ lazy val libs =
       "qa.hedgehog" %% "hedgehog-runner" % props.HedgehogVersion
     )
 
+    lazy val refined4sCore = "io.kevinlee" %% "refined4s-core" % props.Refined4sVersion
+    lazy val refined4sCats = "io.kevinlee" %% "refined4s-cats" % props.Refined4sVersion
+
     lazy val hedgehogLibsForTesting =
-      (hedgehogLibs ++ Seq(
+      Seq(
         "qa.hedgehog" %% "hedgehog-sbt" % props.HedgehogVersion
-      )).map(_ % Test)
+      ).map(_ % Test)
   }
 
 def removeDottyIncompatible(isScala3: Boolean, libraries: Seq[ModuleID]): Seq[ModuleID] =
@@ -164,8 +195,6 @@ def subProject(projectName: ProjectName): Project = {
         else
           ((ThisBuild / baseDirectory).value / ".scalafix-scala2.conf").some
       ),
-      crossScalaVersions := props.CrossScalaVersions,
-      libraryDependencies ++= libs.hedgehogLibs ++ libs.hedgehogLibsForTesting,
       /* WartRemover and scalacOptions { */
 //      Compile / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
 //      Test / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),

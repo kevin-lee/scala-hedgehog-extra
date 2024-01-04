@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         scala:
-          - { name: "Scala", java-version: "11", java-distribution: "temurin", report: "" }
+          - { name: "Scala", java-version: "17", java-distribution: "temurin", report: "" }
 
     steps:
       - uses: actions/checkout@v4
