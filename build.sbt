@@ -25,8 +25,6 @@ ThisBuild / scmInfo :=
 ThisBuild / licenses := props.Licenses
 ThisBuild / resolvers += "sonatype-snapshots" at s"https://${props.SonatypeCredentialHost}/content/repositories/snapshots"
 
-ThisBuild / testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct)
-
 ThisBuild / scalafixConfig := (
   if (scalaVersion.value.startsWith("3")) file(".scalafix-scala3.conf").some
   else file(".scalafix-scala2.conf").some
@@ -89,16 +87,16 @@ lazy val props =
     val RepoName    = "scala-" + ProjectOrigin
 
     val Scala2Version = "2.13.6"
-    val Scala3Version = "3.0.2"
+    val Scala3Version = "3.1.3"
 
     val ProjectScalaVersion = Scala3Version
 //    val ProjectScalaVersion = Scala2Version
     val CrossScalaVersions  =
       Seq(
-        "2.11.12",
-        "2.12.13",
-        Scala2Version,
         Scala3Version,
+        Scala2Version,
+        "2.12.13",
+        "2.11.12",
       ).distinct
 
     val Licenses = List("MIT" -> url("http://opensource.org/licenses/MIT"))
@@ -114,7 +112,7 @@ lazy val props =
           m.name == "better-monadic-for" ||
           m.name == "mdoc"
 
-    val HedgehogVersion = "0.9.0"
+    val HedgehogVersion = "0.10.1"
 
     val IncludeTest = "compile->compile;test->test"
 
@@ -167,7 +165,6 @@ def subProject(projectName: ProjectName): Project = {
           ((ThisBuild / baseDirectory).value / ".scalafix-scala2.conf").some
       ),
       crossScalaVersions := props.CrossScalaVersions,
-      testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
       libraryDependencies ++= libs.hedgehogLibs ++ libs.hedgehogLibsForTesting,
       /* WartRemover and scalacOptions { */
 //      Compile / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
