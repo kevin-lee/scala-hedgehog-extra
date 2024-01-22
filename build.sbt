@@ -140,7 +140,7 @@ lazy val props =
 
     val HedgehogVersion = "0.10.1"
 
-    val Refined4sVersion = "0.11.0"
+    val Refined4sVersion = "0.13.0"
 
     val IncludeTest = "compile->compile;test->test"
 
