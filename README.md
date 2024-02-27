@@ -5,11 +5,11 @@
 [![codecov](https://codecov.io/gh/Kevin-Lee/scala-hedgehog-extra/branch/main/graph/badge.svg?token=AxSbGPSGaC)](https://codecov.io/gh/Kevin-Lee/scala-hedgehog-extra)
 
 ```sbt
-"io.kevinlee" %% "hedgehog-extra-core" % "0.6.0"
+"io.kevinlee" %% "hedgehog-extra-core" % "0.8.0"
 ```
 
 ```sbt
-"io.kevinlee" %% "hedgehog-extra-refined" % "0.6.0"
+"io.kevinlee" %% "hedgehog-extra-refined" % "0.8.0"
 ```
 
 ***
@@ -17,5 +17,5 @@
 For Scala 3, you have the option to use `refined4s` in place of `newtype` and `refined`, along with the support for `refined4s` provided by `hedgehog-extra`.
 
 ```sbt
-"io.kevinlee" %% "hedgehog-extra-refined4s" % "0.6.0"
+"io.kevinlee" %% "hedgehog-extra-refined4s" % "0.8.0"
 ```
