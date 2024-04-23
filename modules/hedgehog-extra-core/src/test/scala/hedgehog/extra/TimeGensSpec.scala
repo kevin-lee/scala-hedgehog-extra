@@ -3,7 +3,7 @@ package hedgehog.extra
 import hedgehog._
 import hedgehog.runner._
 
-import java.time.Instant
+import java.time.{Instant, LocalDate, LocalTime, ZoneOffset}
 import java.time.temporal.ChronoUnit
 
 /** @author Kevin Lee
@@ -13,7 +13,8 @@ object TimeGensSpec extends Properties {
 
   override def tests: List[Test] = List(
     property("test TimeGens.genInstant(from, to)", testGenInstant),
-    property("test TimeGens.genInstantFrom(from, to)", testGenInstantFrom)
+    property("test TimeGens.genInstantFrom(from, to)", testGenInstantFrom),
+    property("test TimeGens.genLocalDate(from, to)", testGenLocalDate)
   )
 
   def testGenInstant: Property =
@@ -46,7 +47,10 @@ object TimeGensSpec extends Properties {
       val fromExpected = base.minusMillis(from.toMillis)
       val toExpected   = base.plusMillis(to.toMillis)
       println(
-        s"""        base=${base.toString}
+        s"""===============================================================================
+           |Test: TimeGens.genInstantFrom(${base.toString}, ${from.toString}, ${to.toString})
+           |- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+           |        base=${base.toString}
            |             ${base.toEpochMilli} ms
            |             ${base.getEpochSecond} s
            |             ${base.getNano} ns
@@ -55,7 +59,7 @@ object TimeGensSpec extends Properties {
            |      actual=${actual.toString}
            |fromExpected=${fromExpected.toString}
            |  toExpected=${toExpected.toString}
-           |--------------------------------------
+           |-------------------------------------------------------------------------------
            |""".stripMargin
       )
       Result.all(
@@ -104,5 +108,42 @@ object TimeGensSpec extends Properties {
       )
     }
   }
+
+  def testGenLocalDate: Property =
+    for {
+      base   <- Gen.constant(LocalDate.now()).log("base")
+      from   <- Gen.constant(base.minus(100, ChronoUnit.DAYS)).log("from")
+      to     <- Gen.constant(base.plus(100, ChronoUnit.DAYS)).log("to")
+      actual <- TimeGens.genLocalDate(from, to).log("actual")
+    } yield {
+      println(
+        s"""=====================================================
+           |Test: TimeGens.genLocalDate(${from.toString}, ${to.toString})
+           |- - - - - - - - - - - - - - - - - - - - - - - - - - -
+           |        base=${base.toString}
+           |             ${base.toEpochDay} days
+           |             ${base.toEpochSecond(LocalTime.MIDNIGHT, ZoneOffset.UTC)} s (midnight, UTC)
+           |        from=${from.toString}
+           |          to=${to.toString}
+           |      actual=${actual.toString}
+           |-----------------------------------------------------
+           |""".stripMargin
+      )
+      Result
+        .diffNamed(
+          "actual == from || actual.isAfter(from) || actual == to || actual.isBefore(to)",
+          actual,
+          (from, to)
+        ) {
+          case (actual, (from, to)) =>
+            actual == from || actual.isAfter(from) || actual == to || actual.isBefore(to)
+        }
+        .log(
+          s"""actual=${actual.toString}
+             |  from=${from.toString}
+             |    to=${to.toString}
+             |""".stripMargin
+        )
+    }
 
 }

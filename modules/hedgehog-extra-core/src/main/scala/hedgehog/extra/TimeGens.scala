@@ -2,7 +2,7 @@ package hedgehog.extra
 
 import hedgehog._
 
-import java.time.Instant
+import java.time.{Instant, LocalDate}
 import scala.concurrent.duration.FiniteDuration
 
 /** @author Kevin Lee
@@ -29,6 +29,12 @@ object TimeGens {
       .map(l => Instant.ofEpochSecond(l / 1000000000L, l % 1000000000))
 //      .long(Range.linear(fromSeconds * 1_000_000_000 + fromNanos, toSeconds * 1_000_000_000 + toNanos))
 //      .map(l => Instant.ofEpochSecond(l / 1_000_000_000L, l % 1_000_000_000))
+  }
+
+  def genLocalDate(from: LocalDate, to: LocalDate): Gen[LocalDate] = {
+    val fromEpochDay = from.toEpochDay
+    val toEpochDay   = to.toEpochDay
+    Gen.long(Range.linear(fromEpochDay, toEpochDay)).map(LocalDate.ofEpochDay)
   }
 
 }
