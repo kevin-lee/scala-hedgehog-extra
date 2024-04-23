@@ -13,7 +13,7 @@ object TimeGensSpec extends Properties {
 
   override def tests: List[Test] = List(
     property("test TimeGens.genInstant(from, to)", testGenInstant),
-    property("test TimeGens.genInstantFrom(from, to)", testGenInstantFrom),
+    property("test TimeGens.genInstantFrom(baseInstant, durationAgo, durationAfter)", testGenInstantFrom),
     property("test TimeGens.genLocalDate(from, to)", testGenLocalDate)
   )
 
