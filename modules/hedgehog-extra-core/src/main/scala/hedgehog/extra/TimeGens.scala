@@ -2,6 +2,7 @@ package hedgehog.extra
 
 import hedgehog._
 
+import java.time.temporal.ChronoUnit
 import java.time.{Instant, LocalDate}
 import scala.concurrent.duration.FiniteDuration
 
@@ -37,4 +38,19 @@ object TimeGens {
     Gen.long(Range.linear(fromEpochDay, toEpochDay)).map(LocalDate.ofEpochDay)
   }
 
+  def genLocalDateFrom(
+    baseLocalDate: LocalDate,
+    durationAgo: FiniteDuration,
+    durationAfter: FiniteDuration
+  ): Gen[LocalDate] = {
+    val from     = baseLocalDate.minus(durationAgo.toDays, ChronoUnit.DAYS)
+    val fromDays = from.toEpochDay
+
+    val to     = baseLocalDate.plus(durationAfter.toDays, ChronoUnit.DAYS)
+    val toDays = to.toEpochDay
+
+    Gen
+      .long(Range.linear(fromDays, toDays))
+      .map(LocalDate.ofEpochDay)
+  }
 }
