@@ -24,6 +24,7 @@ object StringGensSpec extends Properties {
       "test StringGens.genNonEmptyStringMinMax with Gen.unicode",
       testGenNonEmptyStringMinMaxUnicode
     ).withTests(10000),
+    property("test StringGens.genUuid", testGenUuid).withTests(10),
   )
 
   def testGenNonWhitespaceString: Property = for {
@@ -139,6 +140,14 @@ object StringGensSpec extends Properties {
         )((range, actual) => range.exists(_ == actual))
       )
     )
+  }
+
+  def testGenUuid: Property = for {
+    uuid <- StringGens.genUuid.log("uuid")
+  } yield {
+    val expected = java.util.UUID.fromString(uuid.value)
+    val actual   = uuid.toUUID
+    actual ==== expected
   }
 
 }
