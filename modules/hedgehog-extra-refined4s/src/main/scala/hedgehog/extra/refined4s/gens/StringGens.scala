@@ -32,6 +32,11 @@ trait StringGens {
       .genUnsafeNonWhitespaceString(maxLength.value)
       .map(NonBlankString.unsafeFrom)
 
+  def genNonBlankStringMinMax(minLength: PosInt, maxLength: PosInt): Gen[NonBlankString] =
+    Gens
+      .genUnsafeNonWhitespaceStringMinMax(minLength.value, maxLength.value)
+      .map(NonBlankString.unsafeFrom)
+
   def genUuid: Gen[Uuid] =
     Gen.constant(java.util.UUID.randomUUID).map(Uuid(_))
 
