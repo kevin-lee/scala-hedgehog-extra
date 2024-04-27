@@ -24,6 +24,7 @@ object StringGensSpec extends Properties {
       "test StringGens.genNonEmptyStringMinMax with Gen.unicode",
       testGenNonEmptyStringMinMaxUnicode
     ).withTests(10000),
+    property("test StringGens.genNonBlankString", testGenNonBlankString).withTests(10000),
     property("test StringGens.genUuid", testGenUuid).withTests(10),
   )
 
@@ -140,6 +141,19 @@ object StringGensSpec extends Properties {
         )((range, actual) => range.exists(_ == actual))
       )
     )
+  }
+
+  def testGenNonBlankString: Property = for {
+    maxLength      <- NumGens.genPosIntMaxTo(PosInt.unsafeFrom(300)).log("maxLength")
+    nonBlankString <- StringGens.genNonBlankString(maxLength).log("nonBlankString")
+  } yield {
+    (nonBlankString.value.exists(_.isWhitespace) ==== false)
+      .log(
+        "nonBlankString should not contain any whitespace char but it has. " +
+          show"'$nonBlankString' " +
+          show"(${nonBlankString.value.map(c => "\\u%04x".format(c.toInt)).mkString} / " +
+          show"${nonBlankString.value.map(_.toInt).mkString("[", ",", "]")})"
+      )
   }
 
   def testGenUuid: Property = for {
