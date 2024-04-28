@@ -216,7 +216,7 @@ object NumGensSpec extends Properties {
   ///
 
   def testGenNegDoubleWithMinMax: Property = for {
-    n <- NumGens.genNegDouble(NegDouble.MinValue, NegDouble.unsafeFrom(-0.00000000000000000001d)).log("n")
+    n <- NumGens.genNegDouble(NegDouble.MinValue, NegDouble(-0.00000000000000000001d)).log("n")
   } yield {
     Result.all(
       List(
