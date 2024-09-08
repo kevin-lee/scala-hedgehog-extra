@@ -1,3 +1,4 @@
+import sbtcrossproject.CrossProject
 import SbtProjectInfo.{ProjectName, commonWarts}
 import just.semver.SemVer
 
@@ -55,37 +56,44 @@ lazy val hedgehogExtra = Project(props.ProjectName, file("."))
   .settings(noPublish)
   .settings(noDoc)
   .aggregate(
-    extraCore,
-    extraRefined,
-    extraRefined4s,
+    extraCoreJvm,
+    extraCoreJs,
+    extraRefinedJvm,
+    extraRefinedJs,
+    extraRefined4sJvm,
+//    extraRefined4sJs,
   )
 
-lazy val extraCore = subProject(ProjectName("core"))
+lazy val extraCore    = subProject(ProjectName("core"), crossProject(JVMPlatform, JSPlatform))
   .settings(
     crossScalaVersions := props.CrossScalaVersions,
-    libraryDependencies ++= libs.hedgehogLibs ++ libs.hedgehogLibsForTesting,
+    libraryDependencies ++= libs.hedgehogLibs.value ++ libs.hedgehogLibsForTesting.value,
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
+lazy val extraCoreJvm = extraCore.jvm
+lazy val extraCoreJs  = extraCore.js.settings(jsSettingsForFuture)
 
-lazy val extraRefined = subProject(ProjectName("refined"))
+lazy val extraRefined    = subProject(ProjectName("refined"), crossProject(JVMPlatform, JSPlatform))
   .settings(
-    crossScalaVersions := props.CrossScalaVersions,
-    libraryDependencies ++= libs.hedgehogLibs ++ libs.hedgehogLibsForTesting,
+    crossScalaVersions := props.CrossScalaVersions.filter(!_.startsWith("2.11")),
+    libraryDependencies ++= libs.hedgehogLibs.value ++ libs.hedgehogLibsForTesting.value,
     libraryDependencies ++= (SemVer.parseUnsafe(scalaVersion.value) match {
       case SemVer(SemVer.Major(3), SemVer.Minor(mn), _, _, _) if mn >= 2 =>
-        Seq("eu.timepit" %% "refined" % "0.10.2")
+        Seq("eu.timepit" %%% "refined" % "0.10.2")
       case SemVer(SemVer.Major(3), SemVer.Minor(1), _, _, _) =>
-        Seq("eu.timepit" %% "refined" % "0.10.1")
-      case SemVer(SemVer.Major(2), SemVer.Minor(11), _, _, _) =>
-        Seq("eu.timepit" %% "refined" % "0.9.12" excludeAll ("org.scala-lang.modules" %% "scala-xml"))
+        Seq("eu.timepit" %%% "refined" % "0.10.1")
+//      case SemVer(SemVer.Major(2), SemVer.Minor(11), _, _, _) =>
+//        Seq("eu.timepit" %% "refined" % "0.9.12" excludeAll ("org.scala-lang.modules" %% "scala-xml"))
       case _ =>
-        Seq("eu.timepit" %% "refined" % "0.9.27" excludeAll ("org.scala-lang.modules" %% "scala-xml"))
+        Seq("eu.timepit" %%% "refined" % "0.9.27" excludeAll ("org.scala-lang.modules" %% "scala-xml"))
     }),
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
   .dependsOn(extraCore)
+lazy val extraRefinedJvm = extraRefined.jvm
+lazy val extraRefinedJs  = extraRefined.js.settings(jsSettingsForFuture)
 
-lazy val extraRefined4s = subProject(ProjectName("refined4s"))
+lazy val extraRefined4s    = subProject(ProjectName("refined4s"), crossProject(JVMPlatform, JSPlatform))
   .settings(
     scalaVersion := props.Scala3Version,
     crossScalaVersions := Seq.empty,
@@ -93,15 +101,28 @@ lazy val extraRefined4s = subProject(ProjectName("refined4s"))
       (SemVer.parseUnsafe(scalaVersion.value) match {
         case SemVer(SemVer.Major(3), SemVer.Minor(mn), _, _, _) if mn >= 1 =>
           Seq(
-            libs.refined4sCore,
-            libs.refined4sCats % Test,
+            libs.refined4sCore.value,
+            libs.refined4sCats.value % Test,
           )
         case _ =>
           Seq.empty
       }),
+    libraryDependencies := {
+      val sbtV = (pluginCrossBuild / sbtBinaryVersion).value
+
+      libraryDependencies
+        .value
+        .filterNot(lib => lib.name == "sbt-scalajs" || lib.name == "sbt-scalajs-crossproject") ++
+        List(
+          sbt.Defaults.sbtPluginExtra("org.scala-js"       % "sbt-scalajs"              % "1.13.0", sbtV, "2.12"),
+          sbt.Defaults.sbtPluginExtra("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.2", sbtV, "2.12"),
+        )
+    },
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
   .dependsOn(extraCore % props.IncludeTest)
+lazy val extraRefined4sJvm = extraRefined4s.jvm
+lazy val extraRefined4sJs  = extraRefined4s.js.settings(jsSettingsForFuture)
 
 lazy val props =
   new {
@@ -151,18 +172,26 @@ lazy val props =
 
 lazy val libs =
   new {
-    lazy val hedgehogLibs = Seq(
-      "qa.hedgehog" %% "hedgehog-core"   % props.HedgehogVersion,
-      "qa.hedgehog" %% "hedgehog-runner" % props.HedgehogVersion
+    lazy val hedgehogLibs = Def.setting(
+      Seq(
+        "qa.hedgehog" %%% "hedgehog-core"   % props.HedgehogVersion,
+        "qa.hedgehog" %%% "hedgehog-runner" % props.HedgehogVersion
+      )
     )
 
-    lazy val refined4sCore = "io.kevinlee" %% "refined4s-core" % props.Refined4sVersion
-    lazy val refined4sCats = "io.kevinlee" %% "refined4s-cats" % props.Refined4sVersion
+    lazy val refined4sCore = Def.setting {
+      "io.kevinlee" %% "refined4s-core" % props.Refined4sVersion
+    }
+    lazy val refined4sCats = Def.setting {
+      "io.kevinlee" %% "refined4s-cats" % props.Refined4sVersion
+    }
 
     lazy val hedgehogLibsForTesting =
-      Seq(
-        "qa.hedgehog" %% "hedgehog-sbt" % props.HedgehogVersion
-      ).map(_ % Test)
+      Def.setting(
+        Seq(
+          "qa.hedgehog" %%% "hedgehog-sbt" % props.HedgehogVersion
+        ).map(_ % Test)
+      )
   }
 
 def removeDottyIncompatible(isScala3: Boolean, libraries: Seq[ModuleID]): Seq[ModuleID] =
@@ -182,11 +211,13 @@ lazy val mavenCentralPublishSettings: SettingsDefinition = List(
 def prefixedProjectName(name: String) = s"${props.ProjectName}${if (name.isEmpty) "" else s"-$name"}"
 // format: on
 
-def subProject(projectName: ProjectName): Project = {
+def subProject(projectName: ProjectName, crossProject: CrossProject.Builder): CrossProject = {
   val prefixedName = prefixedProjectName(projectName.projectName)
-  Project(prefixedName, file(s"modules/$prefixedName"))
+  crossProject
+    .in(file(s"modules/$prefixedName"))
     .settings(
       name := prefixedName,
+      fork := true,
       semanticdbEnabled := true,
       semanticdbVersion := scalafixSemanticdb.revision,
       scalafixConfig := (
@@ -255,3 +286,11 @@ def subProject(projectName: ProjectName): Project = {
 }
 
 def isScala3(scalaVersion: String): Boolean = scalaVersion.startsWith("3.")
+
+lazy val jsSettingsForFuture: SettingsDefinition = List(
+  Test / fork := false,
+  Test / scalacOptions ++= (if (scalaVersion.value.startsWith("3")) List.empty
+                            else List("-P:scalajs:nowarnGlobalExecutionContext")),
+  Test / compile / scalacOptions ++= (if (scalaVersion.value.startsWith("3")) List.empty
+                                      else List("-P:scalajs:nowarnGlobalExecutionContext")),
+)
