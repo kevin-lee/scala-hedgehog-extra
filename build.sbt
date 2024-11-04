@@ -61,7 +61,7 @@ lazy val hedgehogExtra = Project(props.ProjectName, file("."))
     extraRefinedJvm,
     extraRefinedJs,
     extraRefined4sJvm,
-//    extraRefined4sJs,
+    extraRefined4sJs,
   )
 
 lazy val extraCore    = subProject(ProjectName("core"), crossProject(JVMPlatform, JSPlatform))
@@ -107,17 +107,6 @@ lazy val extraRefined4s    = subProject(ProjectName("refined4s"), crossProject(J
         case _ =>
           Seq.empty
       }),
-    libraryDependencies := {
-      val sbtV = (pluginCrossBuild / sbtBinaryVersion).value
-
-      libraryDependencies
-        .value
-        .filterNot(lib => lib.name == "sbt-scalajs" || lib.name == "sbt-scalajs-crossproject") ++
-        List(
-          sbt.Defaults.sbtPluginExtra("org.scala-js"       % "sbt-scalajs"              % "1.13.0", sbtV, "2.12"),
-          sbt.Defaults.sbtPluginExtra("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.2", sbtV, "2.12"),
-        )
-    },
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
   .dependsOn(extraCore % props.IncludeTest)
@@ -134,7 +123,7 @@ lazy val props =
     val RepoName    = "scala-" + ProjectOrigin
 
     val Scala2Version = "2.13.6"
-    val Scala3Version = "3.1.3"
+    val Scala3Version = "3.3.3"
 
     val ProjectScalaVersion = Scala3Version
 //    val ProjectScalaVersion = Scala2Version
@@ -143,7 +132,6 @@ lazy val props =
         Scala3Version,
         Scala2Version,
         "2.12.13",
-        "2.11.12",
       ).distinct
 
     val Licenses = List("MIT" -> url("http://opensource.org/licenses/MIT"))
@@ -161,7 +149,7 @@ lazy val props =
 
     val HedgehogVersion = "0.10.1"
 
-    val Refined4sVersion = "0.15.0"
+    val Refined4sVersion = "1.0.0"
 
     val IncludeTest = "compile->compile;test->test"
 
@@ -180,10 +168,10 @@ lazy val libs =
     )
 
     lazy val refined4sCore = Def.setting {
-      "io.kevinlee" %% "refined4s-core" % props.Refined4sVersion
+      "io.kevinlee" %%% "refined4s-core" % props.Refined4sVersion
     }
     lazy val refined4sCats = Def.setting {
-      "io.kevinlee" %% "refined4s-cats" % props.Refined4sVersion
+      "io.kevinlee" %%% "refined4s-cats" % props.Refined4sVersion
     }
 
     lazy val hedgehogLibsForTesting =
@@ -293,4 +281,5 @@ lazy val jsSettingsForFuture: SettingsDefinition = List(
                             else List("-P:scalajs:nowarnGlobalExecutionContext")),
   Test / compile / scalacOptions ++= (if (scalaVersion.value.startsWith("3")) List.empty
                                       else List("-P:scalajs:nowarnGlobalExecutionContext")),
+  coverageEnabled := false,
 )
