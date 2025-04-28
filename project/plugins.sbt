@@ -7,12 +7,12 @@ addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.3.15")
 
 addSbtPlugin("ch.epfl.scala"   % "sbt-scalafix"    % "0.14.2")
 addSbtPlugin("org.scalameta"   % "sbt-scalafmt"    % "2.5.4")
-addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.21")
+addSbtPlugin("org.wartremover" % "sbt-wartremover" % "3.3.3")
 
 addSbtPlugin("org.scala-js"       % "sbt-scalajs"              % "1.16.0")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.2")
 
-val SbtDevOopsVersion = "2.23.0"
+val SbtDevOopsVersion = "3.1.0"
 addSbtPlugin("io.kevinlee" % "sbt-devoops-scala"     % SbtDevOopsVersion)
 addSbtPlugin("io.kevinlee" % "sbt-devoops-sbt-extra" % SbtDevOopsVersion)
 addSbtPlugin("io.kevinlee" % "sbt-devoops-github"    % SbtDevOopsVersion)

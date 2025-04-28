@@ -2,7 +2,6 @@ package hedgehog.extra.refined
 
 import hedgehog._
 import hedgehog.runner._
-import eu.timepit.refined.auto._
 import eu.timepit.refined.types.numeric._
 
 /** @author Kevin Lee

@@ -108,7 +108,7 @@ lazy val props =
     val ProjectName = "hedgehog-extra"
     val RepoName    = "scala-" + ProjectOrigin
 
-    val Scala2Version = "2.13.12"
+    val Scala2Version = "2.13.15"
     val Scala3Version = "3.3.4"
 
     val ProjectScalaVersion = Scala3Version
