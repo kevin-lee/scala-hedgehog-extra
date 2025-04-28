@@ -1,13 +1,13 @@
 logLevel := sbt.Level.Warn
 
-addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.10")
+addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.9.3")
 
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.2.2")
-addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.3.2")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.3.1")
+addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.3.15")
 
-addSbtPlugin("ch.epfl.scala"   % "sbt-scalafix"    % "0.10.4")
-addSbtPlugin("org.scalameta"   % "sbt-scalafmt"    % "2.4.6")
-addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.13")
+addSbtPlugin("ch.epfl.scala"   % "sbt-scalafix"    % "0.14.2")
+addSbtPlugin("org.scalameta"   % "sbt-scalafmt"    % "2.5.4")
+addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.21")
 
 addSbtPlugin("org.scala-js"       % "sbt-scalajs"              % "1.16.0")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.2")

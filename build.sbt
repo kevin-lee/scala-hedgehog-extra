@@ -31,20 +31,6 @@ ThisBuild / scalafixConfig := (
   else file(".scalafix-scala2.conf").some
 )
 
-ThisBuild / scalafixScalaBinaryVersion := {
-  val log        = sLog.value
-  val newVersion = if (scalaVersion.value.startsWith("3")) {
-    (ThisBuild / scalafixScalaBinaryVersion).value
-  } else {
-    CrossVersion.binaryScalaVersion(scalaVersion.value)
-  }
-
-  log.info(
-    s">> Change ThisBuild / scalafixScalaBinaryVersion from ${(ThisBuild / scalafixScalaBinaryVersion).value} to $newVersion"
-  )
-  newVersion
-}
-
 ThisBuild / scalafixDependencies += "com.github.xuwei-k" %% "scalafix-rules" % "0.2.15"
 
 lazy val hedgehogExtra = Project(props.ProjectName, file("."))
@@ -122,8 +108,8 @@ lazy val props =
     val ProjectName = "hedgehog-extra"
     val RepoName    = "scala-" + ProjectOrigin
 
-    val Scala2Version = "2.13.6"
-    val Scala3Version = "3.3.3"
+    val Scala2Version = "2.13.12"
+    val Scala3Version = "3.3.4"
 
     val ProjectScalaVersion = Scala3Version
 //    val ProjectScalaVersion = Scala2Version
@@ -131,7 +117,7 @@ lazy val props =
       Seq(
         Scala3Version,
         Scala2Version,
-        "2.12.13",
+        "2.12.18",
       ).distinct
 
     val Licenses = List("MIT" -> url("http://opensource.org/licenses/MIT"))
@@ -207,7 +193,7 @@ def subProject(projectName: ProjectName, crossProject: CrossProject.Builder): Cr
       name := prefixedName,
       fork := true,
       semanticdbEnabled := true,
-      semanticdbVersion := scalafixSemanticdb.revision,
+//      semanticdbVersion := scalafixSemanticdb.revision,
       scalafixConfig := (
         if (scalaVersion.value.startsWith("3"))
           ((ThisBuild / baseDirectory).value / ".scalafix-scala3.conf").some
@@ -246,7 +232,7 @@ def subProject(projectName: ProjectName, crossProject: CrossProject.Builder): Cr
           case "3" =>
             Seq.empty
           case _ =>
-            Seq("com.lihaoyi" % "ammonite" % "3.0.0-M0" % Test cross CrossVersion.full)
+            Seq("com.lihaoyi" % "ammonite" % "3.0.2" % Test cross CrossVersion.full)
         }
       },
       Test / sourceGenerators +=
