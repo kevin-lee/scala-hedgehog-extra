@@ -24,7 +24,6 @@ ThisBuild / scmInfo :=
   )
 
 ThisBuild / licenses := props.Licenses
-ThisBuild / resolvers += "sonatype-snapshots" at s"https://${props.SonatypeCredentialHost}/content/repositories/snapshots"
 
 ThisBuild / scalafixConfig := (
   if (scalaVersion.value.startsWith("3")) file(".scalafix-scala3.conf").some
@@ -38,7 +37,6 @@ lazy val hedgehogExtra = Project(props.ProjectName, file("."))
   .settings(
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
-  .settings(mavenCentralPublishSettings)
   .settings(noPublish)
   .settings(noDoc)
   .aggregate(
@@ -122,9 +120,6 @@ lazy val props =
 
     val Licenses = List("MIT" -> url("http://opensource.org/licenses/MIT"))
 
-    val SonatypeCredentialHost = "s01.oss.sonatype.org"
-    val SonatypeRepository     = s"https://$SonatypeCredentialHost/service/local"
-
     val removeDottyIncompatible: ModuleID => Boolean =
       m =>
         m.name == "wartremover" ||
@@ -173,13 +168,6 @@ def removeDottyIncompatible(isScala3: Boolean, libraries: Seq[ModuleID]): Seq[Mo
     libraries.filterNot(props.removeDottyIncompatible).distinct
   else
     libraries.distinct
-
-lazy val mavenCentralPublishSettings: SettingsDefinition = List(
-  /* Publish to Maven Central { */
-  sonatypeCredentialHost := props.SonatypeCredentialHost,
-  sonatypeRepository := props.SonatypeRepository,
-  /* } Publish to Maven Central */
-)
 
 // format: off
 def prefixedProjectName(name: String) = s"${props.ProjectName}${if (name.isEmpty) "" else s"-$name"}"
@@ -255,7 +243,6 @@ def subProject(projectName: ProjectName, crossProject: CrossProject.Builder): Cr
       /* } Ammonite-REPL */
 
     )
-    .settings(mavenCentralPublishSettings)
 
 }
 
