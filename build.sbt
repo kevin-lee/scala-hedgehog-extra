@@ -101,10 +101,10 @@ lazy val props =
   new {
     val Org = "io.kevinlee"
 
-    val GitHubUsername = "Kevin-Lee"
+    val GitHubUsername = "kevin-lee"
 
     val ProjectName = "hedgehog-extra"
-    val RepoName    = "scala-" + ProjectOrigin
+    val RepoName    = "scala-" + ProjectName
 
     val Scala2Version = "2.13.15"
     val Scala3Version = "3.3.4"
