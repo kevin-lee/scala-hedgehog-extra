@@ -32,6 +32,35 @@ ThisBuild / scalafixConfig := (
 
 ThisBuild / scalafixDependencies += "com.github.xuwei-k" %% "scalafix-rules" % "0.2.15"
 
+/* Single source of truth for aggregation membership used by both root and coverage aggregators.
+ * Update this list when adding/removing modules. The coverage aggregator derives from this.
+ */
+lazy val allAggregatedProjects: Seq[ProjectReference] = List(
+  extraCoreJvm,
+  extraCoreJs,
+  extraCoreNative,
+  extraRefinedJvm,
+  extraRefinedJs,
+  extraRefined4sJvm,
+  extraRefined4sJs,
+)
+
+/* Helper to get project id from a ProjectReference */
+def projectId(ref: ProjectReference): String = ref match {
+  case LocalProject(id) => id
+  case ProjectRef(_, id) => id
+  case RootProject(_) => ""
+  case LocalRootProject => ""
+  case ThisProject => ""
+}
+
+/* Coverage aggregator excludes Scala Native modules by naming convention (*Native) */
+lazy val nonNativeAggregatedProjects: Seq[ProjectReference] =
+  allAggregatedProjects.filterNot { ref =>
+    val id = projectId(ref)
+    id.endsWith("Native") || id.isEmpty
+  }
+
 lazy val hedgehogExtra = Project(props.ProjectName, file("."))
   .enablePlugins(DevOopsGitHubReleasePlugin)
   .settings(
@@ -39,15 +68,15 @@ lazy val hedgehogExtra = Project(props.ProjectName, file("."))
   )
   .settings(noPublish)
   .settings(noDoc)
-  .aggregate(
-    extraCoreJvm,
-    extraCoreJs,
-    extraCoreNative,
-    extraRefinedJvm,
-    extraRefinedJs,
-    extraRefined4sJvm,
-    extraRefined4sJs,
+  .aggregate(allAggregatedProjects*)
+
+lazy val `coverage-aggregate` = (project in file("coverage-aggregate"))
+  .settings(
+    name := "coverage-aggregate"
   )
+  .settings(noPublish)
+  .settings(noDoc)
+  .aggregate(nonNativeAggregatedProjects*)
 
 lazy val extraCore       = subProject(ProjectName("core"), crossProject(JVMPlatform, JSPlatform, NativePlatform))
   .settings(
