@@ -48,14 +48,15 @@ lazy val hedgehogExtra = Project(props.ProjectName, file("."))
     extraRefined4sJs,
   )
 
-lazy val extraCore    = subProject(ProjectName("core"), crossProject(JVMPlatform, JSPlatform))
+lazy val extraCore       = subProject(ProjectName("core"), crossProject(JVMPlatform, JSPlatform, NativePlatform))
   .settings(
     crossScalaVersions := props.CrossScalaVersions,
     libraryDependencies ++= libs.hedgehogLibs.value ++ libs.hedgehogLibsForTesting.value,
     libraryDependencies := removeDottyIncompatible(isScala3(scalaVersion.value), libraryDependencies.value)
   )
-lazy val extraCoreJvm = extraCore.jvm
-lazy val extraCoreJs  = extraCore.js.settings(jsSettingsForFuture)
+lazy val extraCoreJvm    = extraCore.jvm
+lazy val extraCoreJs     = extraCore.js.settings(jsSettingsForFuture)
+lazy val extraCoreNative = extraCore.native.settings(nativeSettings)
 
 lazy val extraRefined    = subProject(ProjectName("refined"), crossProject(JVMPlatform, JSPlatform))
   .settings(
@@ -106,7 +107,7 @@ lazy val props =
     val ProjectName = "hedgehog-extra"
     val RepoName    = "scala-" + ProjectName
 
-    val Scala2Version = "2.13.15"
+    val Scala2Version = "2.13.16"
     val Scala3Version = "3.3.4"
 
     val ProjectScalaVersion = Scala3Version
@@ -128,9 +129,9 @@ lazy val props =
           m.name == "better-monadic-for" ||
           m.name == "mdoc"
 
-    val HedgehogVersion = "0.10.1"
+    val HedgehogVersion = "0.13.0"
 
-    val Refined4sVersion = "1.0.0"
+    val Refined4sVersion = "1.4.0"
 
     val IncludeTest = "compile->compile;test->test"
 
@@ -255,4 +256,8 @@ lazy val jsSettingsForFuture: SettingsDefinition = List(
   Test / compile / scalacOptions ++= (if (scalaVersion.value.startsWith("3")) List.empty
                                       else List("-P:scalajs:nowarnGlobalExecutionContext")),
   coverageEnabled := false,
+)
+
+lazy val nativeSettings: SettingsDefinition = List(
+  Test / fork := false
 )
