@@ -42,6 +42,7 @@ lazy val hedgehogExtra = Project(props.ProjectName, file("."))
   .aggregate(
     extraCoreJvm,
     extraCoreJs,
+    extraCoreNative,
     extraRefinedJvm,
     extraRefinedJs,
     extraRefined4sJvm,

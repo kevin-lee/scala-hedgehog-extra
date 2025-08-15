@@ -16,7 +16,7 @@ trait Gens {
     )
 
   def genNonWhitespaceChar: Gen[Char] =
-    genCharByRange(common.NonWhitespaceCharRange)
+    genCharByRange(hedgehog.extra.common.NonWhitespaceCharRange)
 
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   def genUnsafeNonWhitespaceString(maxLength: Int): Gen[String] =
