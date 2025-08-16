@@ -43,6 +43,7 @@ lazy val allAggregatedProjects: Seq[ProjectReference] = List(
   extraRefinedJs,
   extraRefined4sJvm,
   extraRefined4sJs,
+  extraRefined4sNative,
 )
 
 /* Helper to get project id from a ProjectReference */
@@ -108,7 +109,7 @@ lazy val extraRefined    = subProject(ProjectName("refined"), crossProject(JVMPl
 lazy val extraRefinedJvm = extraRefined.jvm
 lazy val extraRefinedJs  = extraRefined.js.settings(jsSettingsForFuture)
 
-lazy val extraRefined4s    = subProject(ProjectName("refined4s"), crossProject(JVMPlatform, JSPlatform))
+lazy val extraRefined4s    = subProject(ProjectName("refined4s"), crossProject(JVMPlatform, JSPlatform, NativePlatform))
   .settings(
     scalaVersion := props.Scala3Version,
     crossScalaVersions := Seq.empty,
@@ -127,6 +128,14 @@ lazy val extraRefined4s    = subProject(ProjectName("refined4s"), crossProject(J
   .dependsOn(extraCore % props.IncludeTest)
 lazy val extraRefined4sJvm = extraRefined4s.jvm
 lazy val extraRefined4sJs  = extraRefined4s.js.settings(jsSettingsForFuture)
+lazy val extraRefined4sNative = extraRefined4s
+  .native
+  .settings(nativeSettings)
+  .settings(
+    libraryDependencies ++= List(
+      libs.scalaNativeCrypto.value
+    )
+  )
 
 lazy val props =
   new {
@@ -161,7 +170,9 @@ lazy val props =
 
     val HedgehogVersion = "0.13.0"
 
-    val Refined4sVersion = "1.4.0"
+    val Refined4sVersion = "1.6.0"
+
+    val ScalaNativeCryptoVersion = "0.2.1"
 
     val IncludeTest = "compile->compile;test->test"
 
@@ -185,6 +196,9 @@ lazy val libs =
     lazy val refined4sCats = Def.setting {
       "io.kevinlee" %%% "refined4s-cats" % props.Refined4sVersion
     }
+
+    lazy val scalaNativeCrypto =
+      Def.setting("com.github.lolgab" %%% "scala-native-crypto" % props.ScalaNativeCryptoVersion)
 
     lazy val hedgehogLibsForTesting =
       Def.setting(
