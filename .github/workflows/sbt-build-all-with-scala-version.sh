@@ -21,7 +21,7 @@ else
   if [ "$2" == "report" ]
   then
     # For now it does nothing
-    test_task="project coverage-aggregate; coverage; test; coverageReport; coverageAggregate"
+    test_task="coverage test coverageReport coverageAggregate"
 #    test_task="coverage test scalafix coverageReport coverageAggregate coveralls"
 #    echo "report build but it does nothing for now."
   fi
@@ -42,14 +42,14 @@ else
       ++${scala_version}! \
       -v \
       clean \
-      "${test_task}" \
+      ${test_task} \
       packagedArtifacts
   else
     sbt \
       ++${scala_version}! \
       -v \
       clean \
-      "${test_task}" \
+      ${test_task} \
       package
   fi
 
