@@ -7,24 +7,24 @@
 ## hedgehog-extra-core
 
 ```sbt
-"io.kevinlee" %% "hedgehog-extra-core" % "0.13.0"
+"io.kevinlee" %% "hedgehog-extra-core" % "0.14.0"
 ```
 
 For Scala.js and Scala Native,
 ```sbt
-"io.kevinlee" %%% "hedgehog-extra-core" % "0.13.0"
+"io.kevinlee" %%% "hedgehog-extra-core" % "0.14.0"
 ```
 
 
 ## hedgehog-extra-refined
 
 ```sbt
-"io.kevinlee" %% "hedgehog-extra-refined" % "0.13.0"
+"io.kevinlee" %% "hedgehog-extra-refined" % "0.14.0"
 ```
 
 For Scala.js,
 ```sbt
-"io.kevinlee" %%% "hedgehog-extra-refined" % "0.13.0"
+"io.kevinlee" %%% "hedgehog-extra-refined" % "0.14.0"
 ```
 
 
@@ -33,10 +33,10 @@ For Scala.js,
 For Scala 3, you have the option to use `refined4s` in place of `newtype` and `refined`, along with the support for `refined4s` provided by `hedgehog-extra`.
 
 ```sbt
-"io.kevinlee" %% "hedgehog-extra-refined4s" % "0.13.0"
+"io.kevinlee" %% "hedgehog-extra-refined4s" % "0.14.0"
 ```
 
 For Scala.js and Scala Native,
 ```sbt
-"io.kevinlee" %%% "hedgehog-extra-refined4s" % "0.13.0"
+"io.kevinlee" %%% "hedgehog-extra-refined4s" % "0.14.0"
 ```
