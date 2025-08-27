@@ -3,7 +3,6 @@ package hedgehog.extra.refined4s.gens
 import cats.syntax.all.*
 import hedgehog.*
 import hedgehog.runner.*
-import refined4s.modules.cats.derivation.types.all.given
 import refined4s.types.all.*
 
 /** @author Kevin Lee
