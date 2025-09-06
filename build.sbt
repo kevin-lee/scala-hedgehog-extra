@@ -108,6 +108,48 @@ lazy val extraRefined4sNative = extraRefined4s
     )
   )
 
+lazy val docs = (project in file("docs-gen-tmp/docs"))
+  .enablePlugins(MdocPlugin, DocusaurPlugin)
+  .settings(
+    scalaVersion := props.Scala3Version,
+    name := prefixedProjectName("docs"),
+    mdocIn := file("docs/latest"),
+    mdocOut := file("generated-docs/docs"),
+    cleanFiles += ((ThisBuild / baseDirectory).value / "generated-docs" / "docs"),
+    scalacOptions ~= (ops => ops.filter(op => !op.startsWith("-Wunused:imports") && op != "-Wnonunit-statement")),
+    libraryDependencies ++= {
+      import sys.process.*
+      "git fetch --tags".!
+      val tag           = "git rev-list --tags --max-count=1".!!.trim
+      val latestVersion = s"git describe --tags $tag".!!.trim.stripPrefix("v")
+
+      List(
+        "io.kevinlee" %%% "hedgehog-extra-core"      % latestVersion,
+        "io.kevinlee" %%% "hedgehog-extra-refined"   % latestVersion,
+        "io.kevinlee" %%% "hedgehog-extra-refined4s" % latestVersion,
+      )
+    },
+    mdocVariables := {
+      val latestVersion = {
+        import sys.process.*
+        "git fetch --tags".!
+        val tag = "git rev-list --tags --max-count=1".!!.trim
+        s"git describe --tags $tag".!!.trim.stripPrefix("v")
+      }
+      val websiteDir    = docusaurDir.value
+
+      val latestVersionFile = websiteDir / "latestVersion.json"
+      val latestVersionJson = s"""{"version":"$latestVersion"}"""
+      IO.write(latestVersionFile, latestVersionJson)
+      Map(
+        "VERSION" -> latestVersion
+      )
+    },
+    docusaurDir := (ThisBuild / baseDirectory).value / "website",
+    docusaurBuildDir := docusaurDir.value / "build",
+  )
+  .settings(noPublish)
+
 lazy val props =
   new {
     val Org = "io.kevinlee"
