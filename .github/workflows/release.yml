@@ -38,6 +38,7 @@ jobs:
           CURRENT_BRANCH_NAME: ${{ github.ref }}
           RUN_ID: ${{ github.run_id }}
           RUN_NUMBER: ${{ github.run_number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JVM_OPTS: ${{ env.GH_JVM_OPTS }}
         run: |
           echo "[BEFORE]CURRENT_BRANCH_NAME=${CURRENT_BRANCH_NAME}"
@@ -145,6 +146,7 @@ jobs:
           PGP_SECRET: ${{ secrets.PGP_SECRET }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JVM_OPTS: ${{ env.GH_JVM_OPTS }}
         run: |
           echo "Run] sbt ci-release"

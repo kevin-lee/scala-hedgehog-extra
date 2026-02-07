@@ -1,6 +1,7 @@
 import sbtcrossproject.CrossProject
 import SbtProjectInfo.{ProjectName, commonWarts}
 import just.semver.SemVer
+import extras.scala.io.syntax.color._
 
 ThisBuild / scalaVersion := props.ProjectScalaVersion
 ThisBuild / organization := props.Org
@@ -118,10 +119,7 @@ lazy val docs = (project in file("docs-gen-tmp/docs"))
     cleanFiles += ((ThisBuild / baseDirectory).value / "generated-docs" / "docs"),
     scalacOptions ~= (ops => ops.filter(op => !op.startsWith("-Wunused:imports") && op != "-Wnonunit-statement")),
     libraryDependencies ++= {
-      import sys.process.*
-      "git fetch --tags".!
-      val tag           = "git rev-list --tags --max-count=1".!!.trim
-      val latestVersion = s"git describe --tags $tag".!!.trim.stripPrefix("v")
+      val latestVersion = DocsTools.getTheLatestTaggedVersion(props.GitHubUsername, props.CodeRepoName)(println)
 
       List(
         "io.kevinlee" %%% "hedgehog-extra-core"      % latestVersion,
@@ -129,24 +127,38 @@ lazy val docs = (project in file("docs-gen-tmp/docs"))
         "io.kevinlee" %%% "hedgehog-extra-refined4s" % latestVersion,
       )
     },
-    mdocVariables := {
-      val latestVersion = {
-        import sys.process.*
-        "git fetch --tags".!
-        val tag = "git rev-list --tags --max-count=1".!!.trim
-        s"git describe --tags $tag".!!.trim.stripPrefix("v")
-      }
-      val websiteDir    = docusaurDir.value
-
-      val latestVersionFile = websiteDir / "latestVersion.json"
-      val latestVersionJson = s"""{"version":"$latestVersion"}"""
-      IO.write(latestVersionFile, latestVersionJson)
-      Map(
-        "VERSION" -> latestVersion
-      )
-    },
     docusaurDir := (ThisBuild / baseDirectory).value / "website",
     docusaurBuildDir := docusaurDir.value / "build",
+    mdocVariables := {
+      implicit val logger: Logger = sLog.value
+
+      val latestVersion = DocsTools.getTheLatestTaggedVersion(props.GitHubUsername, props.CodeRepoName)(logger.error(_))
+      DocsTools.createMdocVariables(latestVersion)
+    },
+    mdoc := {
+      implicit val logger: Logger = sLog.value
+
+      val latestVersion = DocsTools.getTheLatestTaggedVersion(props.GitHubUsername, props.CodeRepoName)(logger.error(_))
+
+      val envVarCi = sys.env.get("CI")
+      val ciResult = s"""sys.env.get("CI")=${envVarCi}"""
+      envVarCi match {
+        case Some("true") =>
+          logger.info(
+            s">> ${ciResult.yellow} so ${"run".green} `${"writeLatestVersion".blue}` and `${"writeVersionsArchived".blue}`."
+          )
+          val websiteDir = docusaurDir.value
+          DocsTools.writeLatestVersion(websiteDir, latestVersion)
+          DocsTools.writeVersionsArchived(props.GitHubUsername, props.CodeRepoName)(websiteDir, latestVersion)(logger)
+        case Some(_) | None =>
+          logger.info(
+            s">> ${ciResult.yellow} so it will ${"not run".red} `${"writeLatestVersion".cyan}` and `${"writeVersionsArchived".cyan}`.\n" +
+              s">> If you want to write these files locally, run sbt with ${"CI=true".yellow}.\n" +
+              s">> e.g.) ${"CI=true".blue} ${"sbt".blue}"
+          )
+      }
+      mdoc.evaluated
+    },
   )
   .settings(noPublish)
 
@@ -158,6 +170,8 @@ lazy val props =
 
     val ProjectName = "hedgehog-extra"
     val RepoName    = "scala-" + ProjectName
+
+    val CodeRepoName = RepoName
 
     val Scala2Version = "2.13.16"
     val Scala3Version = "3.3.4"
