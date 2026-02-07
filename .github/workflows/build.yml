@@ -39,6 +39,7 @@ jobs:
           CURRENT_BRANCH_NAME: ${{ github.ref }}
           RUN_ID: ${{ github.run_id }}
           RUN_NUMBER: ${{ github.run_number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JVM_OPTS: ${{ env.GH_JVM_OPTS }}
         run: |
           echo "[BEFORE]CURRENT_BRANCH_NAME=${CURRENT_BRANCH_NAME}"
@@ -59,6 +60,7 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           RUN_NUMBER: ${{ github.run_number }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JVM_OPTS: ${{ env.GH_JVM_OPTS }}
         run: |
           echo "Rull request to the '${CURRENT_BRANCH_NAME}' branch"
