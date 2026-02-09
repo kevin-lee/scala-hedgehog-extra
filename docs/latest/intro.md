@@ -97,7 +97,7 @@ libraryDependencies += "io.kevinlee" %%% "hedgehog-extra-core" % "@VERSION@"
 
 ### hedgehog-extra-refined4s
 
-For Scala 3, you have the option to use `refined4s` in place of `newtype` and `refined`, along with the support for `refined4s` provided by `hedgehog-extra`.
+**For Scala 3**, you have the option to use `refined4s` in place of `newtype` and `refined`, along with the support for `refined4s` provided by `hedgehog-extra`.
 
 <Tabs
 groupId="hedgehog-extra"
