@@ -197,7 +197,7 @@ lazy val props =
 
     val HedgehogVersion = "0.13.0"
 
-    val Refined4sVersion = "1.14.2"
+    val Refined4sVersion = "1.16.0"
 
     val ScalaNativeCryptoVersion = "0.2.1"
 
