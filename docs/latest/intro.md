@@ -39,13 +39,12 @@ Hedgehog Extra also supports Scala.js and Scala Native.
 :::
 
 ## Getting Started
-
 To get `hedgehog-extra` for your project,
 
-### hedgehog-extra-core
+### `hedgehog-extra-core`
 
 <Tabs
-groupId="hedgehog-extra"
+groupId="hedgehog-extra-core"
 defaultValue="hedgehog-extra-sbt"
 values={[
 {label: 'sbt', value: 'hedgehog-extra-sbt'},
@@ -66,7 +65,7 @@ or for Scala.js and Scala Native
 "io.kevinlee" %%% "hedgehog-extra-core" % "@VERSION@"
 ```
 
-  </TabItem>
+</TabItem>
 
   <TabItem value="hedgehog-extra-sbt-lib">
 
@@ -95,7 +94,7 @@ libraryDependencies += "io.kevinlee" %%% "hedgehog-extra-core" % "@VERSION@"
 
 ***
 
-### hedgehog-extra-refined4s
+### `hedgehog-extra-refined4s`
 
 **For Scala 3**, you have the option to use `refined4s` in place of `newtype` and `refined`, along with the support for `refined4s` provided by `hedgehog-extra`.
 
@@ -121,7 +120,7 @@ or for Scala.js and Scala Native
 "io.kevinlee" %%% "hedgehog-extra-refined4s" % "@VERSION@"
 ```
 
-  </TabItem>
+</TabItem>
 
   <TabItem value="hedgehog-extra-sbt-lib">
 
@@ -150,8 +149,7 @@ libraryDependencies += "io.kevinlee" %%% "hedgehog-extra-refined4s" % "@VERSION@
 
 ***
 
-
-### hedgehog-extra-refined
+### `hedgehog-extra-refined`
 
 <Tabs
 groupId="hedgehog-extra"
@@ -175,7 +173,7 @@ or for Scala.js
 "io.kevinlee" %%% "hedgehog-extra-refined" % "@VERSION@"
 ```
 
-  </TabItem>
+</TabItem>
 
   <TabItem value="hedgehog-extra-sbt-lib">
 
@@ -285,5 +283,22 @@ libraryDependencies ++= Seq(
   </TabItem>
 </Tabs>
 
-## MORE TO BE ADDED LATER
+## Documentation
 
+- [core module](/docs/core)
+- [refined4s module](/docs/refined4s)
+- [refined module](/docs/refined)
+
+## Quick Start (Functional Composition)
+
+```scala mdoc
+import hedgehog.*
+import hedgehog.extra.Gens
+import hedgehog.extra.NumGens
+
+val userCodeGen: Gen[String] =
+  for {
+    (min, max) <- NumGens.genIntMinMaxPair(4, 12)
+    suffix     <- Gens.genUnsafeNonWhitespaceStringMinMax(min, max)
+  } yield s"user-$suffix"
+```
