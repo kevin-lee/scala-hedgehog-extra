@@ -17,14 +17,38 @@ import eu.timepit.refined.types.time.*
 ## Time-part generators
 
 ```scala mdoc
+val genMonthMinMax: Gen[Month] =
+  TimeGens.genMonthMinMax(Month.unsafeFrom(1), Month.unsafeFrom(12))
+
 val genMonth: Gen[Month] =
   TimeGens.genMonth
 
-val genBusinessHour: Gen[Hour] =
-  TimeGens.genHourMinMax(Hour.unsafeFrom(9), Hour.unsafeFrom(17))
+val genDayMinMax: Gen[Day] =
+  TimeGens.genDayMinMax(Day.unsafeFrom(1), Day.unsafeFrom(31))
+
+val genDay: Gen[Day] =
+  TimeGens.genDay
+
+val genHourMinMax: Gen[Hour] =
+  TimeGens.genHourMinMax(Hour.unsafeFrom(0), Hour.unsafeFrom(23))
+
+val genHour: Gen[Hour] =
+  TimeGens.genHour
+
+val genMinuteMinMax: Gen[Minute] =
+  TimeGens.genMinuteMinMax(Minute.unsafeFrom(0), Minute.unsafeFrom(59))
+
+val genMinute: Gen[Minute] =
+  TimeGens.genMinute
+
+val genSecondMinMax: Gen[Second] =
+  TimeGens.genSecondMinMax(Second.unsafeFrom(0), Second.unsafeFrom(59))
 
 val genSecond: Gen[Second] =
   TimeGens.genSecond
+
+val genMillisMinMax: Gen[Millis] =
+  TimeGens.genMillisMinMax(Millis.unsafeFrom(0), Millis.unsafeFrom(999))
 
 val genMillis: Gen[Millis] =
   TimeGens.genMillis
