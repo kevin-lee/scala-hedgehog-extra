@@ -31,7 +31,7 @@ ThisBuild / scalafixConfig := (
   else file(".scalafix-scala2.conf").some
 )
 
-ThisBuild / scalafixDependencies += "com.github.xuwei-k" %% "scalafix-rules" % "0.2.15"
+ThisBuild / scalafixDependencies += "com.github.xuwei-k" %% "scalafix-rules" % "0.6.29"
 
 lazy val hedgehogExtra = Project(props.ProjectName, file("."))
   .enablePlugins(DevOopsGitHubReleasePlugin)
@@ -66,7 +66,9 @@ lazy val extraRefined    = subProject(ProjectName("refined"), crossProject(JVMPl
     crossScalaVersions := props.CrossScalaVersions.filter(!_.startsWith("2.11")),
     libraryDependencies ++= libs.hedgehogLibs.value ++ libs.hedgehogLibsForTesting.value,
     libraryDependencies ++= (SemVer.parseUnsafe(scalaVersion.value) match {
-      case SemVer(SemVer.Major(3), SemVer.Minor(mn), _, _, _) if mn >= 2 =>
+      case SemVer(SemVer.Major(3), SemVer.Minor(mn), _, _, _) if mn >= 3 =>
+        Seq("eu.timepit" %%% "refined" % props.RefinedVersion)
+      case SemVer(SemVer.Major(3), SemVer.Minor(2), _, _, _) =>
         Seq("eu.timepit" %%% "refined" % "0.10.2")
       case SemVer(SemVer.Major(3), SemVer.Minor(1), _, _, _) =>
         Seq("eu.timepit" %%% "refined" % "0.10.1")
@@ -173,8 +175,8 @@ lazy val props =
 
     val CodeRepoName = RepoName
 
-    val Scala2Version = "2.13.16"
-    val Scala3Version = "3.3.4"
+    val Scala2Version = "2.13.18"
+    val Scala3Version = "3.3.7"
 
     val ProjectScalaVersion = Scala3Version
 //    val ProjectScalaVersion = Scala2Version
@@ -182,7 +184,7 @@ lazy val props =
       Seq(
         Scala3Version,
         Scala2Version,
-        "2.12.18",
+        "2.12.21",
       ).distinct
 
     val Licenses = List("MIT" -> url("http://opensource.org/licenses/MIT"))
@@ -195,11 +197,13 @@ lazy val props =
           m.name == "better-monadic-for" ||
           m.name == "mdoc"
 
-    val HedgehogVersion = "0.13.0"
+    val HedgehogVersion = "0.14.0"
 
-    val Refined4sVersion = "1.16.0"
+    val RefinedVersion = "0.11.4"
 
-    val ScalaNativeCryptoVersion = "0.2.1"
+    val Refined4sVersion = "1.20.0"
+
+    val ScalaNativeCryptoVersion = "0.4.0"
 
     val IncludeTest = "compile->compile;test->test"
 
@@ -292,7 +296,7 @@ def subProject(projectName: ProjectName, crossProject: CrossProject.Builder): Cr
           case "3" =>
             Seq.empty
           case _ =>
-            Seq("com.lihaoyi" % "ammonite" % "3.0.2" % Test cross CrossVersion.full)
+            Seq("com.lihaoyi" % "ammonite" % "3.0.9" % Test cross CrossVersion.full)
         }
       },
       Test / sourceGenerators +=
