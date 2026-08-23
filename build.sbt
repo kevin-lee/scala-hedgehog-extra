@@ -105,11 +105,6 @@ lazy val extraRefined4sJs  = extraRefined4s.js.settings(jsSettingsForFuture)
 lazy val extraRefined4sNative = extraRefined4s
   .native
   .settings(nativeSettings)
-  .settings(
-    libraryDependencies ++= List(
-      libs.scalaNativeCrypto.value
-    )
-  )
 
 lazy val docs = (project in file("docs-gen-tmp/docs"))
   .enablePlugins(MdocPlugin, DocusaurPlugin)
@@ -203,8 +198,6 @@ lazy val props =
 
     val Refined4sVersion = "1.21.0"
 
-    val ScalaNativeCryptoVersion = "0.4.0"
-
     val IncludeTest = "compile->compile;test->test"
 
     val isScala3IncompatibleScalacOption: String => Boolean =
@@ -227,9 +220,6 @@ lazy val libs =
     lazy val refined4sCats = Def.setting {
       "io.kevinlee" %%% "refined4s-cats" % props.Refined4sVersion
     }
-
-    lazy val scalaNativeCrypto =
-      Def.setting("com.github.lolgab" %%% "scala-native-crypto" % props.ScalaNativeCryptoVersion)
 
     lazy val hedgehogLibsForTesting =
       Def.setting(

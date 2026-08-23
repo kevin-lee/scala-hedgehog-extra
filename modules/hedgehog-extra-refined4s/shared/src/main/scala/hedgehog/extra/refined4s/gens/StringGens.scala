@@ -36,7 +36,15 @@ trait StringGens {
       .map(NonBlankString.unsafeFrom)
 
   def genUuid: Gen[Uuid] =
-    Gen.constant(java.util.UUID.randomUUID).map(Uuid(_))
+    for {
+      msb <- Gen.long(Range.constant(Long.MinValue, Long.MaxValue))
+      lsb <- Gen.long(Range.constant(Long.MinValue, Long.MaxValue))
+    } yield Uuid(
+      new java.util.UUID(
+        (msb & ~0xf000L) | 0x4000L, // version 4, as randomUUID
+        (lsb & 0x3fffffffffffffffL) | 0x8000000000000000L, // IETF variant, as randomUUID
+      )
+    )
 
 }
 object StringGens extends StringGens
