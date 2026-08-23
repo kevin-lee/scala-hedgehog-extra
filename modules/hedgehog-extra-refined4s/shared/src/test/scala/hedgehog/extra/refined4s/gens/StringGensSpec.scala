@@ -25,7 +25,7 @@ object StringGensSpec extends Properties {
     ).withTests(10000),
     property("test StringGens.genNonBlankString", testGenNonBlankString).withTests(10000),
     property("test StringGens.genNonBlankStringMinMax", testGenNonBlankStringMinMax).withTests(10000),
-    property("test StringGens.genUuid", testGenUuid).withTests(10),
+    property("test StringGens.genUuid", testGenUuid).withTests(1000),
   )
 
   def testGenNonWhitespaceString: Property = for {
