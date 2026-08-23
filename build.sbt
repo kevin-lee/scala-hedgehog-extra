@@ -201,7 +201,7 @@ lazy val props =
 
     val RefinedVersion = "0.11.4"
 
-    val Refined4sVersion = "1.20.0"
+    val Refined4sVersion = "1.21.0"
 
     val ScalaNativeCryptoVersion = "0.4.0"
 
