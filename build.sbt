@@ -192,7 +192,7 @@ lazy val props =
           m.name == "better-monadic-for" ||
           m.name == "mdoc"
 
-    val HedgehogVersion = "0.14.0"
+    val HedgehogVersion = "0.15.0"
 
     val RefinedVersion = "0.11.4"
 
